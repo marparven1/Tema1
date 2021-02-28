@@ -1,0 +1,112 @@
+---
+title: "Hoja 1 de problemas y prácticas con R"
+author: "Departamento de Estadística e Investigación Operativa. Universidad de Sevilla"
+subtitle: Estadística Computacional I. Grado en Estadística
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1. Crear un vector donde se repitan los códigos provinciales de Andalucía: 10 veces Almería, 10 veces Cádiz, ..., 10 veces Jaén, 15 para Málaga y 18 Sevilla. Permutar aleatoriamente los elementos de dicho vector y calcular la tabla de frecuencias.
+
+
+```{r}
+codigos=c(4,11,14,18,21,23,29,41)
+#acceder a elementos:
+Provincias =c("Almería","Cádiz","Jaén","Córdoba","Huelva","Málaga","Sevilla","Granada")
+num_repe=c(10,10,10,10,10,15,18,10)
+cod_repe=rep(codigos,times=num_repe)
+
+Tabla=cbind(cod_repe,rep(Provincias,num_repe))
+colnames(Tabla)=c("Código_Provincia","Provincia")
+Tabla
+```
+
+
+
+2. Con la ayuda de paste, crear un vector de nombres "Caso_1",...,"Caso_30".
+
+```{r}
+
+```
+
+
+3. Generar dos vectores de tamaño 250, seleccionando aleatoriamente números enteros entre 0 y 999, sean x e y los vectores resultantes.
+    i)	Visualizarlos en dos columnas.
+    ii)	Construir el vector $y_2-x_1,\ldots,y_{250}-x_{249}$.
+    iii) Generar el vector $y_2-y_1,\ldots,y_{250}-y_{249}$.
+    iv)	Construir el vector $x_1+2x_2-x_3,x_2+2x_3-x_4,...,x_{248}+2x_{249}-x_{250}$.
+    v)	Calcular la suma de los valores 1/($x_i+y_i$).
+
+
+
+```{r}
+set.seed(1357) #semilla del generador
+```
+
+
+
+
+4.	Continuando con los vectores x e y anteriores:
+    i)	Determinar las posiciones y valores de los $y_i>600$.
+    ii)	Construir una matriz con las posiciones y valores anteriores, y con los valores de x en esas posiciones.
+    iii)	Guardar las posiciones como nombres de filas de la matriz anterior.
+    iv)	Construir el vector $|x_1-xmedia|^{1/2}$,....,$|x_n-xmedia|^{1/2}$.
+    v)	Calcular el número de elementos de y que distan menos de 200 del máximo de y.
+    vi)	¿Cuántos elementos de x son pares?
+    vii)	Seleccionar los elementos de x en posiciones donde y sea múltiplo de 5.
+    viii)	Ordenar los elementos de x según la ordenación creciente de y.
+
+
+```{r}
+```
+
+
+
+
+
+
+5.	Calcular $1+ (1+2) + ...+ (1+2+3..+10)$.
+
+```{r}
+
+```
+
+
+6.	Calcular $1+ (2/3) + (2/3)(4/5)+...+(2/3)(4/5)(6/7)+...+ ( (2/3)(4/5)(6/7)...(38/39) )$.
+
+```{r}
+
+```
+
+
+7.	Construir una matriz n x n con 0 en la diagonal, +1 en la mitad triangular superior y -1 en la mitad triangular inferior.
+
+```{r}
+
+```
+
+
+8.	Construir una matriz con la tabla de multiplicar.
+
+```{r}
+
+```
+
+
+9.	Construir una matriz 6x9 con enteros aleatorios en 1, ..., 10.
+    i) Calcular la suma de cada fila, visualizarlo en una nueva columna.
+    ii)	Calcular el máximo de cada columna, visualizarlo en una fila nueva.
+    iii) Calcular el producto matricial de A por su traspuesta.
+
+```{r}
+set.seed(12345)
+
+```
+
+
