@@ -168,10 +168,32 @@ pull(v2) %>% # Me quedo con la columna v2 en formato vector
     
 $x_1+2x_2-x_3,x_2+2x_3-x_4,...,x_{248}+2x_{249}-x_{250}$.
 
+```{r}
+v4=x[1:248]+2*x[2:249]-x[3:250]
+v4
+```
+Otra forma:
+
+```{r}
+xyt %>% 
+  mutate(
+    t1=x,
+    t2=lead(x,n=1), # Empieza por el 2º
+    t3=lead(x,n=2), # Empieza por el 3º
+    v3= t1+2*t2-t3
+  ) %>% 
+  pull(v3) %>% 
+  head(10)
+```
+
+
     v)	Calcular la suma de los valores
     
 $\frac{1}{(x_i+y_i)}$
 
+```{r}
+sum(1/(x+y))
+```
 
 
 
