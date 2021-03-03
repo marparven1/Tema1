@@ -9,6 +9,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 
@@ -24,7 +25,7 @@ cod_repe=rep(codigos,times=num_repe)
 
 Tabla=cbind(cod_repe,rep(Provincias,num_repe))
 colnames(Tabla)=c("Código_Provincia","Provincia")
-Tabla
+
 ```
 
 
