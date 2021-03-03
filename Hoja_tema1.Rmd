@@ -199,40 +199,156 @@ sum(1/(x+y))
 
 
 4.	Continuando con los vectores x e y anteriores:
+
+**Solución**:
+
     i)	Determinar las posiciones y valores de los $y_i>600$.
+    
+```{r}
+cbind(which(y>600), y[which(y>600)]) %>% 
+  head(10)
+```
+Sistema tidyverse:
+
+```{r}
+xyt %>% 
+  mutate(posicion = row_number()) %>% 
+  filter(y>600) %>% 
+  select(posicion , y) %>% 
+  head(10)
+```
+
+ 
+ 
+    
     ii)	Construir una matriz con las posiciones y valores anteriores, y con los valores de x en esas posiciones.
+  
+```{r}
+xyt %>% 
+  mutate(posicion = row_number()) %>% 
+  filter(y>600) %>% 
+  select(posicion , x) %>% 
+  as.matrix() %>% 
+  head(10)
+```
+
+    
     iii)	Guardar las posiciones como nombres de filas de la matriz anterior.
+    
+```{r}
+xyt %>% 
+  mutate(posicion = row_number()) %>% 
+  filter(y>600) %>% 
+  select(posicion ,y, x) %>% 
+  as.matrix()->xytmat
+
+rownames(xytmat)= xytmat[,1]
+xytmat=xytmat[,-1] 
+xytmat %>% head()
+```
+    
+    
     iv)	Construir el vector $|x_1-xmedia|^{1/2}$,....,$|x_n-xmedia|^{1/2}$.
+    
+```{r}
+(xmedia = mean(x))
+abs(x-xmedia)^(1/2)
+```
+  
+  
+    
     v)	Calcular el número de elementos de y que distan menos de 200 del máximo de y.
+    
+```{r}
+length(which(abs(y-max(y))<200))
+```
+    
+```{r}
+xyt %>% 
+  mutate(
+    distancia=abs(y-max(y))
+  ) %>% 
+  filter(distancia<200) %>% 
+  count()
+#  summarise(
+#    cuantos = n() )
+
+```
+    
+    
     vi)	¿Cuántos elementos de x son pares?
+    
+```{r}
+length(which((x %% 2)==0))
+```
+  
+```{r}
+xyt %>% 
+  filter((x %% 2)==0) %>% 
+  count()
+# La expresión `x %% 2` es módulo. Calcula cual es el resto de la división.
+```
+  
+  
+    
     vii)	Seleccionar los elementos de x en posiciones donde y sea múltiplo de 5.
+    
+    
+```{r}
+xyt %>% 
+  mutate( Resto=(y %% 5)==0) %>% 
+  filter(Resto==TRUE) %>% 
+  pull(x)
+
+# Otra forma: 
+    #xyt %>%  filter ((y%%5) ==0) %>%  pull(x)
+```
+
+Otra forma 
+
+```{r}
+x[(y%%5)==0]
+```
+    
     viii)	Ordenar los elementos de x según la ordenación creciente de y.
 
-**Solución**:
 
 ```{r}
+xyt %>%  
+  arrange(y) %>% 
+  pull(x) %>% 
+  head(10)
 ```
 
 
 
 
 
-
-5.	Calcular $1+ (1+2) + ...+ (1+2+3..+10)$.
+5.	Calcular $1+ (1+2) + ...+ (1+2+3+...+10)$.
 
 **Solución**:
 
 ```{r}
+# cumsum(1:10) Cada uno de los sumandos del ejercicio
+cumsum(1:10) %>% 
+  sum()
 
+# Otra forma:
+# sum(cumsum(1:10)) 
 ```
 
 
-6.	Calcular $1+ (2/3) + (2/3)(4/5)+...+(2/3)(4/5)(6/7)+...+ ( (2/3)(4/5)(6/7)...(38/39) )$.
+6.	Calcular: 
+
+$1+ (2/3) + (2/3)(4/5)+(2/3)(4/5)(6/7)+...+ ( (2/3)(4/5)(6/7)...(38/39) )$.
 
 **Solución**:
 
 ```{r}
-
+v6=c(1,seq(2,38,by=2)/seq(3,39, by=2))
+v6
+cumprod(v6) %>% 
+  sum()
 ```
 
 
