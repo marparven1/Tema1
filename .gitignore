@@ -5,6 +5,8 @@
 *.log
 *.tex
 *.aux
+.Rmd
+.pdf
 Tema1.Proj
 #Sólo sube los que hago control de versiones, es decir,
 # los que no estan aqui
