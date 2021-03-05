@@ -146,8 +146,7 @@ Otra forma:
 ```{r}
 datos2 %>% 
   summarise_each(
-   c( sd, mean)
- )
+   c( sd, mean))
 ```
 
 
@@ -163,20 +162,69 @@ datos2 %>%
 
 
 ## ii)	Dibujar la nube de puntos (Peso, Altura) y superponer la recta de mínimos cuadrados. Calcular el coeficiente de correlación lineal entre ambas variables.
-```{r}
 
+
+
+```{r}
+regresion <- lm(Peso ~ Altura, data = datos2)
+y_predict <- predict(regresion, datos2)
+
+ggplot(data=datos2, aes(Peso,Altura)) + 
+  geom_point()+
+  geom_line(aes( x = datos2$Peso, y = y_predict), color = "red") +
+  labs(
+    title = "Nube de puntos con recta de mínimos cuadrados.",
+    subtitle = "Altura y peso",
+    y="Altura (cm)",
+    x="Peso (kg)"
+  )+
+  theme_linedraw()
+```
+
+
+
+
+```{r}
+regresion <- lm(Peso ~ Altura, data = datos2)
+summary(regresion)
 ```
 
 
 ## iii)	¿Qué observación es outlier para la variable peso?  Repetir el apartado anterior sin esa persona.
 ```{r}
+datos2 %>% 
+  arrange(Peso) %>% 
+  head(1)
+```
 
+```{r}
+datos2new=datos2[-1,]
+
+```
+
+```{r}
+regresion <- lm(Peso ~ Altura, data = datos2new)
+y_predict <- predict(regresion, datos2new)
+summary(regresion)
+ggplot(data=datos2new, aes(Peso,Altura)) + 
+  geom_point()+
+  #geom_line(aes( x = datos2new$Peso, y = y_predict), color = "red") +
+  labs(
+    title = "Nube de puntos con recta de mínimos cuadrados.",
+    subtitle = "Altura y peso",
+    y="Altura (cm)",
+    x="Peso (kg)"
+  )+
+  theme_linedraw()
 ```
 
 
 ## iv)	Calcular el Índice de Masa Corporal (IMC), definido como el cociente entre el peso y el cuadrado de la altura (en metros). Representarlo con un gráfico de barras.
 
 ```{r}
+datos2 %>% 
+  arrange(Peso) %>% 
+  head(1)
 
 ```
 
