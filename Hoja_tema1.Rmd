@@ -35,7 +35,7 @@ codrepetidospermutados
 ```{r}
 table(codrepetidospermutados)
 Provincias =c("Almería","Cádiz","Jaén","Granada","Córdoba","Huelva","Málaga","Sevilla")
-table(factor(codrepetidospermutados),labels=Provincias)
+#table(factor(codrepetidospermutados),labels=Provincias)
 ```
 
 
@@ -357,7 +357,15 @@ cumprod(v6) %>%
 **Solución**:
 
 ```{r}
+n=n
+m1<-diag(0,10,10) 
+lower.tri(m1)
+m1[lower.tri(m1)] <- -1
 
+upper.tri(m1)
+m1[upper.tri(m1)] <- 1
+
+m1
 ```
 
 
@@ -366,19 +374,66 @@ cumprod(v6) %>%
 **Solución**:
 
 ```{r}
+numeros=c(1:10)
+cbind(numeros,numeros)
 
+m=matrix(1:10,nrow=10,ncol=10)
+m[1,]=numeros
+
+diag(m)=diag(m)^2
+
+m[-c(1,2),2]=2*m[-c(1,2),2]
+m[-c(1,3),3]=3*m[-c(1,3),3]
+m[-c(1,4),4]=4*m[-c(1,4),4]
+m[-c(1,5),5]=5*m[-c(1,5),5]
+m[-c(1,6),6]=6*m[-c(1,6),6]
+m[-c(1,7),7]=7*m[-c(1,7),7]
+m[-c(1,8),8]=8*m[-c(1,8),8]
+m[-c(1,9),9]=9*m[-c(1,9),9]
+m[-c(1,10),10]=10*m[-c(1,10),10]
+m
 ```
 
 
 9.	Construir una matriz 6x9 con enteros aleatorios en 1, ..., 10.
-    i) Calcular la suma de cada fila, visualizarlo en una nueva columna.
-    ii)	Calcular el máximo de cada columna, visualizarlo en una fila nueva.
-    iii) Calcular el producto matricial de A por su traspuesta.
 
-**Solución**:
 ```{r}
 set.seed(12345)
+num=sample(1:10,size = 54,replace = T)
+matriz=matrix(data = num,nrow = 6,ncol = 9)
+```
 
+    i) Calcular la suma de cada fila, visualizarlo en una nueva columna.
+    
+```{r}
+colSums(matriz)
+m2=cbind(matriz,sumas=colSums(matriz))
+m2
+```
+
+    
+    ii)	Calcular el máximo de cada columna, visualizarlo en una fila nueva.
+    
+```{r}
+maximos=c(
+max(matriz[,1]),
+max(matriz[,2]),
+max(matriz[,3]),
+max(matriz[,4]),
+max(matriz[,6]),
+max(matriz[,7]),
+max(matriz[,8]),
+max(matriz[,9]))
+mat_max=rbind(matriz,maximos)
+mat_max
+```
+    
+    
+    iii) Calcular el producto matricial de A por su traspuesta.
+
+
+```{r}
+matriz%*% t(matriz)
 ```
 
 
