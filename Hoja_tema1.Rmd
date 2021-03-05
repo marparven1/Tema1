@@ -3,8 +3,8 @@ title: "Hoja 1 de problemas y prácticas con R"
 author: "Departamento de Estadística e Investigación Operativa. Universidad de Sevilla"
 subtitle: Estadística Computacional I. Grado en Estadística
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
