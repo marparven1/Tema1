@@ -3,17 +3,27 @@ title: "Hoja 2 de problemas y prácticas con R"
 author: "Departamento de Estadística e Investigación Operativa. Universidad de Sevilla"
 subtitle: Estadística Computacional I. Grado en Estadística
 output:
-  html_document: default
-  pdf_document: default
+  pdf_document: 
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  html_document:
+    theme: united
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.align = "center",
+                      out.width="60%")
 library(tidyverse)
+library(kableExtra)
 ```
 
 
-# 1. Generar una muestra de calificaciones de 50 alumnos con el comando:
+# Generar una muestra de calificaciones de 50 alumnos con el comando:
 
     `sample(c("1S","2A","3N","4SB","5MH"),prob=c(0.3,0.35,0.2,0.1,0.05),50,rep=T)`.
 ```{r}
@@ -24,7 +34,7 @@ m1
 ```
 
 
-## i)	 Resumir los valores obtenidos mediante una tabla de frecuencias incluyendo frecuencias absolutas, frecuencias relativas, porcentajes, y los acumulados de las tres características. 
+## Resumir los valores obtenidos mediante una tabla de frecuencias incluyendo frecuencias absolutas, frecuencias relativas, porcentajes, y los acumulados de las tres características. 
     
 ```{r}
 tablafre=tibble(valores=m1) %>% 
@@ -40,11 +50,13 @@ tablafre=tibble(valores=m1) %>%
     Pi=cumsum(pi) 
     )
   
-tablafre
+tablafre %>% 
+  kable(booktabs=TRUE) %>%
+  kable_styling(latex_options = "striped"  )
 ```
 
     
-## ii)	Obtener representaciones gráficas adecuadas de las medidas anteriores.
+## Obtener representaciones gráficas adecuadas de las medidas anteriores.
 
 ```{r}
 tablafre %>% 
@@ -121,13 +133,16 @@ tablafre %>%
 
 
 
-# 2. El fichero "Familia.txt" contiene el peso (kgs) y la altura (cms) de los integrantes de una familia.
+# Fichero "Familia.txt"
 
+El fichero "Familia.txt" contiene el peso (kgs) y la altura (cms) de los integrantes de una familia.
 
-## i)	Leer en R este fichero y calcular la media y la cuasidesviación típica de cada variable.
+## Leer en R este fichero y calcular la media y la cuasidesviación típica de cada variable.
 ```{r}
 datos2=read.table(file="Familia.txt",sep=" ")
-head(datos2)
+head(datos2) %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
 ```
 
 
@@ -138,7 +153,9 @@ datos2 %>%
     MediaPeso = mean(Peso),
     SdAltura=sd(Altura),
     SdPeso=sd(Peso)
-  )
+  ) %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
 
 ```
 Otra forma:
@@ -146,7 +163,9 @@ Otra forma:
 ```{r}
 datos2 %>% 
   summarise_each(
-   c( sd, mean))
+   c( sd, mean)) %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
 ```
 
 
@@ -156,42 +175,48 @@ Otra forma:
 datos2 %>% 
   summarise_all(
     list(mean,sd)
-  )
+  )  %>% 
+kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped")
 ```
 
 
 
-## ii)	Dibujar la nube de puntos (Peso, Altura) y superponer la recta de mínimos cuadrados. Calcular el coeficiente de correlación lineal entre ambas variables.
+## Nube de puntos y recta de mínimos cuadrados
 
+Dibujar la nube de puntos (Peso, Altura) y superponer la recta de mínimos cuadrados. Calcular el coeficiente de correlación lineal entre ambas variables.
+
+Coeficiente de correlación lineal 
+
+```{r}
+datos2 %>% 
+  summarise(
+    Ccirlineal=cor(Peso,Altura) 
+    )-> ccl
+```
 
 
 ```{r}
-regresion <- lm(Peso ~ Altura, data = datos2)
-y_predict <- predict(regresion, datos2)
-
 ggplot(data=datos2, aes(Peso,Altura)) + 
   geom_point()+
-  geom_line(aes( x = datos2$Peso, y = y_predict), color = "red") +
+  geom_smooth(method=lm, se=FALSE, formula = y~x)+  #Quito los IC 
   labs(
     title = "Nube de puntos con recta de mínimos cuadrados.",
-    subtitle = "Altura y peso",
+    subtitle = paste0("Con coeficiente de correlación lineal, r = " , round(ccl,4)),
     y="Altura (cm)",
-    x="Peso (kg)"
-  )+
+    x="Peso (kg)" )+
   theme_linedraw()
 ```
 
 
 
 
-```{r}
-regresion <- lm(Peso ~ Altura, data = datos2)
-summary(regresion)
-```
+## Outliers
 
-
-## iii)	¿Qué observación es outlier para la variable peso?  Repetir el apartado anterior sin esa persona.
+¿Qué observación es outlier para la variable peso?  Repetir el apartado anterior sin esa persona.
 ```{r}
+res2=boxplot(datos2$Peso)
+res2 # Mirlo las estadísticas del diagrama.
 datos2 %>% 
   arrange(Peso) %>% 
   head(1)
@@ -199,102 +224,158 @@ datos2 %>%
 
 ```{r}
 datos2new=datos2[-1,]
-
 ```
 
 ```{r}
-regresion <- lm(Peso ~ Altura, data = datos2new)
-y_predict <- predict(regresion, datos2new)
-summary(regresion)
+datos2new %>% 
+  summarise(
+    Ccirlineal=cor(Peso,Altura) 
+    )-> ccl
+```
+
+
+```{r}
 ggplot(data=datos2new, aes(Peso,Altura)) + 
   geom_point()+
-  #geom_line(aes( x = datos2new$Peso, y = y_predict), color = "red") +
+  geom_smooth(method=lm, se=FALSE, formula = y~x)+  #Quito los IC 
   labs(
     title = "Nube de puntos con recta de mínimos cuadrados.",
-    subtitle = "Altura y peso",
+    subtitle = paste0("Con coeficiente de correlación lineal, r = " , round(ccl,4)),
     y="Altura (cm)",
-    x="Peso (kg)"
-  )+
+    x="Peso (kg)" )+
   theme_linedraw()
 ```
 
 
-## iv)	Calcular el Índice de Masa Corporal (IMC), definido como el cociente entre el peso y el cuadrado de la altura (en metros). Representarlo con un gráfico de barras.
+## IMC
+
+Calcular el Índice de Masa Corporal (IMC), definido como el cociente entre el peso y el cuadrado de la altura (en metros). Representarlo con un gráfico de barras.
 
 ```{r}
-datos2 %>% 
-  arrange(Peso) %>% 
-  head(1)
+dat2imc= datos2 %>% 
+  mutate(IMC=Peso/((Altura/100)^2))
 
-```
-
-## v)	Ordenar los familiares de mayor a menor IMC. 
-
-
-```{r}
-
+dat2imc %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
 ```
 
 
+Vamos a definir cuatro intervalos para representar mis datos, empleamos el método del rango intercuartílico.
 
-3. Acceder al fichero alkfos de la librería ISwR:
-
-    i)	Ver los primeros casos y los últimos.
-    ii)	Reformatear los datos a la estructura grp time  c id.
-    iii)	Ordenar el nuevo formato por grp, id y time, y mostrar las variables en el orden (grp, id, time, c).
-
-
-
-
-
-4. Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses. Cada variable toma valores de 1 a 6, a mayor valor más lejos del peso ideal. Representar gráficamente la evolución de los pesos medios según la dieta.
-
-
-
-
-
-
-5.	En este problema se trabajará con el conjunto de datos Boston de la librería  MASS.
-
-    i)	Acceder a los datos, en particular, averiguar qué información contiene y cuál es la dimensionalidad de los datos. 
-    ii)	Ordenar las variables según el valor absoluto de su coeficiente de correlación lineal con medv (variable a predecir en este conjunto de datos).
-    iii)	¿Destaca algún distrito por su tasa de criminalidad? Similarmente, por los impuestos sobre la propiedad o por la ratio alumnos-profesor.
-    iv)	¿Cuántos distritos son limítrofes con el río? Calcular las medias de crim y medv según chas.
-    v)	Analizar la relación lineal entre lstat y medv.
+```{r}
+dat2imc %>% 
+  mutate(
+    IMCargu=cut(IMC,breaks=4)
+  ) %>% ggplot(aes(x=IMCargu))+
+  geom_bar()+
+  labs(
+    
+  x="IMC agrupado",
+  y="Frecuencia",
+  title="Diagrama de barras (IMC agrupado)"
+  )
+```
 
 
 
 
 
-6. Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
 
-    i)	Analizar la relación lineal entre las medias y las cuasivarianzas.
-    ii)	Estudiar gráficamente si los cocientes (n-1)*cuasivar/(sigma^2) siguen una ley chi-cuadrado.
+## Ordenar
 
-
-
-7. Comprobar mediante una simulación el ajuste de  las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
+Ordenar los familiares de mayor a menor IMC. 
 
 
+```{r}
+dat2imc %>% 
+  arrange(desc(IMC  ) ) %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped")
+```
 
 
-8. El fichero "salarios.txt" contiene datos sobre el salario (variable wage) y otras características para 3000 trabajadores.
+# Librería *ISwR*
 
-    i)	Leer en R los datos.
-    ii)	Representar gráficamente los salarios según las variables age, year y education, y superponer estimaciones de la media del salario según cada variable.
-    iii)	Dibujar la evolución anual del salario medio según el nivel educativo.
-    iv)	Calcular los porcentajes de variación interanual del salario medio según nivel educativo.
-    v)	Ordenar el fichero de datos según año (creciente) y edad (decreciente).
+Acceder al fichero alkfos de la librería ISwR:
+
+```{r}
+library(ISwR)
+alkfos %>% 
+  kable(booktabs=TRUE,longtable=T,caption="Fichero alkfos") %>% 
+  kable_styling(latex_options = c("striped","repeat_header"))
+```
+
+
+## Ver los primeros casos y los últimos.
+
+```{r}
+alkfos[c(1,2,3,41,42,43),] %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped", stripe_index = c(1,2,5:6))
+```
+
+
+## Reformatear los datos a la estructura grp time  c id.
+## Ordenar el nuevo formato por grp, id y time, y mostrar las variables en el orden (grp, id, time, c).
 
 
 
-9. Acceder al data frame painters de la librería MASS.
 
-    i) Interpretar y resumir la información contenida en este fichero de datos.
-    ii)	Seleccionar las escuelas del renacimiento y Veneciana para los siguientes apartados.
-    iii) Generar en una sola pantalla los diagramas de caja y bigotes según la escuela.
-    iv)	Construir nubes de puntos en las que se distinga la escuela.
-    v)	Comparar mediante gráficos de barras las medias de ambas escuelas.
+# Fichero *"dietas.dat"*
+
+Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses.Cada variable toma valores de 1 a 6, a mayor valor más lejos del peso ideal. Representar gráficamente la evolución de los pesos medios según la dieta.
+
+
+
+
+
+
+*En este problema se trabajará con el conjunto de datos Boston de la librería  MASS.*
+
+## Acceder a los datos, en particular, averiguar qué información contiene y cuál es la dimensionalidad de los datos. 
+## Ordenar las variables según el valor absoluto de su coeficiente de correlación lineal con medv (variable a predecir en este conjunto de datos).
+## ¿Destaca algún distrito por su tasa de criminalidad? Similarmente, por los impuestos sobre la propiedad o por la ratio alumnos-profesor.
+## ¿Cuántos distritos son limítrofes con el río? Calcular las medias de crim y medv según chas.
+## Analizar la relación lineal entre lstat y medv.
+
+
+
+
+
+# Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
+
+## Analizar la relación lineal entre las medias y las cuasivarianzas.
+## Estudiar gráficamente si los cocientes (n-1)*cuasivar/(sigma^2) siguen una ley chi-cuadrado.
+
+
+
+# Comprobar mediante una simulación el ajuste de  las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
+
+
+
+
+# Fichero *"salarios.txt"*
+
+El fichero "salarios.txt" contiene datos sobre el salario (variable wage) y otras características para 3000 trabajadores.
+
+## Leer en R los datos.
+## Representar gráficamente los salarios según las variables age, year y education, y superponer estimaciones de la media del salario según cada variable.
+## Dibujar la evolución anual del salario medio según el nivel educativo.
+## Calcular los porcentajes de variación interanual del salario medio según nivel educativo.
+## Ordenar el fichero de datos según año (creciente) y edad (decreciente).
+
+
+
+# Librería *MASS*
+
+Acceder al data frame painters de la librería MASS.
+
+## Interpretar y resumir la información contenida en este fichero de datos.
+## Seleccionar las escuelas del renacimiento y Veneciana para los siguientes apartados.
+## Generar en una sola pantalla los diagramas de caja y bigotes según la escuela.
+## Construir nubes de puntos en las que se distinga la escuela.
+## Comparar mediante gráficos de barras las medias de ambas escuelas.
 
 
 

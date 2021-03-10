@@ -5,7 +5,6 @@
 *.log
 *.tex
 *.aux
-.Rmd
 .html
 .pdf
 Tema1.Proj
