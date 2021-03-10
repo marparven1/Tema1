@@ -6,6 +6,7 @@
 *.tex
 *.aux
 .Rmd
+.html
 .pdf
 Tema1.Proj
 #Sólo sube los que hago control de versiones, es decir,
