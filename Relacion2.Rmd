@@ -319,13 +319,37 @@ alkfos[c(1,2,3,41,42,43),] %>%
 ## Reformatear los datos a la estructura grp time  c id.
 ## Ordenar el nuevo formato por grp, id y time, y mostrar las variables en el orden (grp, id, time, c).
 
+```{r}
+
+```
 
 
 
 # Fichero *"dietas.dat"*
 
-Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses.Cada variable toma valores de 1 a 6, a mayor valor más lejos del peso ideal. Representar gráficamente la evolución de los pesos medios según la dieta.
+Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses. 
 
+```{r}
+dietas=read.table("dietas.dat",sep = " ",col.names = paste0("Dieta_",c(1:7)))
+```
+
+Cada variable toma valores de 1 a 6, a mayor valor más lejos del peso ideal. Representar gráficamente la evolución de los pesos medios según la dieta.
+
+
+```{r}
+medias=c(
+mean(dietas[,1]),
+mean(dietas[,2]),
+mean(dietas[,3]),
+mean(dietas[,4]),
+mean(dietas[,5]),
+mean(dietas[,6]),
+mean(dietas[,7]))
+
+plot(medias)
+
+
+```
 
 
 
