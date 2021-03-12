@@ -22,10 +22,12 @@ library(tidyverse)
 library(kableExtra)
 ```
 
+# Generar una muestra
 
-# Generar una muestra de calificaciones de 50 alumnos con el comando:
+De las calificaciones de 50 alumnos con el comando:
 
     `sample(c("1S","2A","3N","4SB","5MH"),prob=c(0.3,0.35,0.2,0.1,0.05),50,rep=T)`.
+
 ```{r}
 set.seed(12345)
 m1=sample(c("1S","2A","3N","4SB","5MH"),
@@ -33,9 +35,10 @@ m1=sample(c("1S","2A","3N","4SB","5MH"),
 m1
 ```
 
+## Resumir valores
 
-## Resumir los valores obtenidos mediante una tabla de frecuencias incluyendo frecuencias absolutas, frecuencias relativas, porcentajes, y los acumulados de las tres características. 
-    
+Mediante una tabla de frecuencias incluyendo frecuencias absolutas, frecuencias relativas, porcentajes, y los acumulados de las tres características.
+
 ```{r}
 tablafre=tibble(valores=m1) %>% 
   group_by(valores) %>% 
@@ -55,7 +58,6 @@ tablafre %>%
   kable_styling(latex_options = "striped"  )
 ```
 
-    
 ## Obtener representaciones gráficas adecuadas de las medidas anteriores.
 
 ```{r}
@@ -70,7 +72,6 @@ tablafre %>%
   )
 ```
 
-
 ```{r}
 tablafre %>% 
   ggplot(aes(x=valores , y = fi)) + 
@@ -83,7 +84,6 @@ tablafre %>%
   )
 ```
 
-
 ```{r}
 tablafre %>% 
   ggplot(aes(x=valores , y = pi)) + 
@@ -95,6 +95,7 @@ tablafre %>%
     x="Calificaciones"
   )
 ```
+
 ```{r}
 tablafre %>% 
   ggplot(aes(x=valores , y = Fi, group=1)) + 
@@ -115,6 +116,7 @@ Diagrama de sectores con el sistema base:
 tablafre$fi
 pie(tablafre$ni, labels = tablafre$valores)
 ```
+
 Diagrama de sectores con ggplot2:
 
 ```{r}
@@ -131,20 +133,18 @@ tablafre %>%
   )
 ```
 
-
-
 # Fichero "Familia.txt"
 
 El fichero "Familia.txt" contiene el peso (kgs) y la altura (cms) de los integrantes de una familia.
 
 ## Leer en R este fichero y calcular la media y la cuasidesviación típica de cada variable.
+
 ```{r}
 datos2=read.table(file="Familia.txt",sep=" ")
 head(datos2) %>% 
   kable(booktabs=TRUE) %>%
 kable_styling(latex_options = "striped")
 ```
-
 
 ```{r}
 datos2 %>% 
@@ -158,6 +158,7 @@ datos2 %>%
 kable_styling(latex_options = "striped")
 
 ```
+
 Otra forma:
 
 ```{r}
@@ -167,7 +168,6 @@ datos2 %>%
   kable(booktabs=TRUE) %>%
 kable_styling(latex_options = "striped")
 ```
-
 
 Otra forma:
 
@@ -180,13 +180,11 @@ kable(booktabs=TRUE) %>%
   kable_styling(latex_options = "striped")
 ```
 
-
-
 ## Nube de puntos y recta de mínimos cuadrados
 
 Dibujar la nube de puntos (Peso, Altura) y superponer la recta de mínimos cuadrados. Calcular el coeficiente de correlación lineal entre ambas variables.
 
-Coeficiente de correlación lineal 
+Coeficiente de correlación lineal
 
 ```{r}
 datos2 %>% 
@@ -194,7 +192,6 @@ datos2 %>%
     Ccirlineal=cor(Peso,Altura) 
     )-> ccl
 ```
-
 
 ```{r}
 ggplot(data=datos2, aes(Peso,Altura)) + 
@@ -208,12 +205,10 @@ ggplot(data=datos2, aes(Peso,Altura)) +
   theme_linedraw()
 ```
 
-
-
-
 ## Outliers
 
-¿Qué observación es outlier para la variable peso?  Repetir el apartado anterior sin esa persona.
+¿Qué observación es outlier para la variable peso? Repetir el apartado anterior sin esa persona.
+
 ```{r}
 res2=boxplot(datos2$Peso)
 res2 # Mirlo las estadísticas del diagrama.
@@ -233,7 +228,6 @@ datos2new %>%
     )-> ccl
 ```
 
-
 ```{r}
 ggplot(data=datos2new, aes(Peso,Altura)) + 
   geom_point()+
@@ -245,7 +239,6 @@ ggplot(data=datos2new, aes(Peso,Altura)) +
     x="Peso (kg)" )+
   theme_linedraw()
 ```
-
 
 ## IMC
 
@@ -259,7 +252,6 @@ dat2imc %>%
   kable(booktabs=TRUE) %>%
 kable_styling(latex_options = "striped")
 ```
-
 
 Vamos a definir cuatro intervalos para representar mis datos, empleamos el método del rango intercuartílico.
 
@@ -277,15 +269,9 @@ dat2imc %>%
   )
 ```
 
-
-
-
-
-
 ## Ordenar
 
-Ordenar los familiares de mayor a menor IMC. 
-
+Ordenar los familiares de mayor a menor IMC.
 
 ```{r}
 dat2imc %>% 
@@ -294,114 +280,276 @@ dat2imc %>%
   kable_styling(latex_options = "striped")
 ```
 
-
 # Librería *ISwR*
 
 Acceder al fichero alkfos de la librería ISwR:
 
 ```{r}
 library(ISwR)
+data(alkfos) # Cargamos los datos
 alkfos %>% 
   kable(booktabs=TRUE,longtable=T,caption="Fichero alkfos") %>% 
   kable_styling(latex_options = c("striped","repeat_header"))
 ```
 
-
 ## Ver los primeros casos y los últimos.
 
 ```{r}
+
 alkfos[c(1,2,3,41,42,43),] %>% 
   kable(booktabs=TRUE) %>% 
   kable_styling(latex_options = "striped", stripe_index = c(1,2,5:6))
+
+alkfos %>% head() %>%  tail()
+
 ```
 
+## Reformatear los datos a la estructura grp time c id.
 
-## Reformatear los datos a la estructura grp time  c id.
+Grupo, tiempo y valor observado.
+
+```{r}
+alkfos_fl = alkfos %>%
+  pivot_longer(names_to = "cid",
+               values_to = "time",
+               cols = -grp) %>%
+  #para que aparezca primero el 3 luego el 6... sería conveniente quitar la c
+  mutate(
+    cid=as.integer(gsub("c","",cid))
+  ) %>%
+  select(grp,time,cid)
+View(alkfos_fl)
+```
+
 ## Ordenar el nuevo formato por grp, id y time, y mostrar las variables en el orden (grp, id, time, c).
 
 ```{r}
-
+alkfos_fl %>% 
+  arrange(grp,cid,time) %>% 
+  select(grp,cid,time) %>% 
+  head(6) %>% 
+  tail(6) %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling("striped")
 ```
-
-
 
 # Fichero *"dietas.dat"*
 
-Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses. 
+Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses.
 
 ```{r}
-dietas=read.table("dietas.dat",sep = " ",col.names = paste0("Dieta_",c(1:7)))
+dietas=read.table("dietas.dat",sep = " ", header = FALSE)
+datos_dietas=dietas %>% 
+  rename(
+    Dieta=V1,
+    PesosM1=V2,
+    PesosM2=V3,
+    PesosM3=V4,
+    PesosM4=V5,
+    PesosM5=V6,
+    PesosM6=V7
+  )
+datos_dietas %>% 
+  head()
 ```
 
 Cada variable toma valores de 1 a 6, a mayor valor más lejos del peso ideal. Representar gráficamente la evolución de los pesos medios según la dieta.
 
+Está en formato ancho, deberíamos pasarlo al formato largo para poder manipular mejor los datos.
 
 ```{r}
-medias=c(
-mean(dietas[,1]),
-mean(dietas[,2]),
-mean(dietas[,3]),
-mean(dietas[,4]),
-mean(dietas[,5]),
-mean(dietas[,6]),
-mean(dietas[,7]))
+datos_dietas_largo=datos_dietas %>% 
+  pivot_longer(
+    names_to = "Mes",
+    values_to = "Peso",
+    cols=-Dieta
+  ) %>% 
 
-plot(medias)
+  mutate(
+    # Mes = as.numeric(gsub("PesosM","",Mes))
+  Mes =  recode(Mes,
+                "PesosM1"=1L,
+                "PesosM2"=2L,
+                "PesosM3"=3L,
+                "PesosM4"=4L,
+                "PesosM5"=5L,
+                "PesosM6"=6L )
+  ) %>% 
+  arrange(Dieta,Mes)
+#L obliga a que el dato sea entero en lugar de numeric, aunque no pasaría nada.
+datos_dietas_largo %>% head() %>% kable()
 
 
 ```
 
+Vamos a calcular los pesos medios, por meses y para cada dieta.
 
+```{r}
+media_dietas=
+  datos_dietas_largo %>% 
+  group_by(Dieta,Mes) %>% 
+  summarise(PesoMedio=mean(Peso,na.rm=TRUE))
+  
+media_dietas %>% kable(booktabs=TRUE) %>% kable_styling("striped")
+```
 
+Hacemos ahora la representación
 
+```{r}
+media_dietas %>% 
+  ggplot(aes(x=Mes,y=PesoMedio,colour=factor(Dieta)))+
+  geom_line(size=0.9)+
+  scale_x_continuous(breaks = 1:6)+
+  labs(
+    title="Comparación de 4 dietas durante 6 meses",
+    subtitle = "(mayor valor más alejado del peso ideal)",
+    y="Peso medio",
+    colour="Dieta" # Puedo hacerlo porque al definir le he llamado así.
+  )
 
-*En este problema se trabajará con el conjunto de datos Boston de la librería  MASS.*
+```
 
-## Acceder a los datos, en particular, averiguar qué información contiene y cuál es la dimensionalidad de los datos. 
+Dieta 3 un poco mejor que la 1.
+
+La dieta 2 se estabiliza en valores bajos y sube y baja.
+
+La que se mantiene siemrpe cerca e valores bajos es la 4, por lo que podría ser la mejor dieta.
+
+# Datos *Boston*
+
+*En este problema se trabajará con el conjunto de datos Boston de la librería MASS.*
+
+## Acceder a los datos, en particular, averiguar qué información contiene y cuál es la dimensionalidad de los datos.
+
+```{r}
+library(MASS)
+?Boston
+# gls(Boston)
+glimpse(Boston)
+
+```
+
 ## Ordenar las variables según el valor absoluto de su coeficiente de correlación lineal con medv (variable a predecir en este conjunto de datos).
+
+```{r}
+CorB=Boston %>% 
+  map_dbl(~cor(.x,Boston$medv)) #Calcula coef corr lineal con la vble medv
+sort(abs(CorB))
+
+```
+
 ## ¿Destaca algún distrito por su tasa de criminalidad? Similarmente, por los impuestos sobre la propiedad o por la ratio alumnos-profesor.
-## ¿Cuántos distritos son limítrofes con el río? Calcular las medias de crim y medv según chas.
+
+### Tasa de criminalidad
+
+```{r}
+Boston %>% 
+  arrange(desc(crim)) %>% 
+    dplyr::select(crim,everything()) %>% 
+  slice(1:5,(nrow(Boston)-4):nrow(Boston)) # 5 primeras y 5 últimas. 506-4=504, 
+# de esa a la 506
+
+
+```
+
+### Tasa de propiedad
+
+```{r}
+Boston %>% 
+  arrange(desc(tax)) %>% 
+  dplyr::select(tax,everything()) %>% 
+  slice(1:5,(nrow(Boston)-4):nrow(Boston)) # Slice selecciona filas: slice(1) Da la 1 fila
+
+```
+
+### Ratio Alumno-Profesor
+
+```{r}
+Boston %>% 
+  arrange(desc(ptratio)) %>% 
+  dplyr::select(ptratio,everything()) %>% 
+  slice(1:5,(nrow(Boston)-4):nrow(Boston)) 
+```
+
+## ¿Cuántos distritos son limítrofes con el río? 
+
+```{r}
+Boston %>% 
+  filter(chas==1) %>% 
+  summarise(
+    CuantosDistritos=n()
+  )
+
+```
+
+## Calcular las medias de crim y medv según chas.
+
+```{r}
+Boston %>% 
+  group_by(chas) %>% 
+  summarise(
+    Media_crim= mean(crim,na.rm=TRUE),
+    Media_medv= mean(medv,na.rm=TRUE)
+  ) %>% 
+  mutate(
+    limitrofeRio=recode(chas,
+                        '0'="No limítrofe",
+                        '1'="Si limítrofe") #Podríamos haber recodificado chas.
+  )
+
+```
+
 ## Analizar la relación lineal entre lstat y medv.
 
+```{r}
+regrelineal=Boston %>% 
+ dplyr:: select(lstat,medv) %>% 
+  lm(formula = lstat~medv)
+regrelineal
 
 
+```
 
+```{r}
+summary(regrelineal)
+```
 
-# Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
+# Teorema de Fisher
+
+Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
 
 ## Analizar la relación lineal entre las medias y las cuasivarianzas.
 
-## Estudiar gráficamente si los cocientes (n-1)*cuasivar/(sigma^2) siguen una ley chi-cuadrado.
+## Estudiar gráficamente si los cocientes (n-1)\*cuasivar/(sigma\^2) siguen una ley chi-cuadrado.
 
+# Simulaciones
 
-
-# Comprobar mediante una simulación el ajuste de  las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
-
-
-
+Comprobar mediante una simulación el ajuste de las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
 
 # Fichero *"salarios.txt"*
 
 El fichero "salarios.txt" contiene datos sobre el salario (variable wage) y otras características para 3000 trabajadores.
 
 ## Leer en R los datos.
+
 ## Representar gráficamente los salarios según las variables age, year y education, y superponer estimaciones de la media del salario según cada variable.
+
 ## Dibujar la evolución anual del salario medio según el nivel educativo.
+
 ## Calcular los porcentajes de variación interanual del salario medio según nivel educativo.
+
 ## Ordenar el fichero de datos según año (creciente) y edad (decreciente).
-
-
 
 # Librería *MASS*
 
 Acceder al data frame painters de la librería MASS.
 
 ## Interpretar y resumir la información contenida en este fichero de datos.
+
 ## Seleccionar las escuelas del renacimiento y Veneciana para los siguientes apartados.
+
 ## Generar en una sola pantalla los diagramas de caja y bigotes según la escuela.
+
 ## Construir nubes de puntos en las que se distinga la escuela.
+
 ## Comparar mediante gráficos de barras las medias de ambas escuelas.
-
-
-
-
