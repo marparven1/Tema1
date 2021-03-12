@@ -1,0 +1,407 @@
+---
+title: "Hoja 2 de problemas y prácticas con R"
+author: "Departamento de Estadística e Investigación Operativa. Universidad de Sevilla"
+subtitle: Estadística Computacional I. Grado en Estadística
+output:
+  pdf_document: 
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  html_document:
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.align = "center",
+                      out.width="60%")
+library(tidyverse)
+library(kableExtra)
+```
+
+
+# Generar una muestra de calificaciones de 50 alumnos con el comando:
+
+    `sample(c("1S","2A","3N","4SB","5MH"),prob=c(0.3,0.35,0.2,0.1,0.05),50,rep=T)`.
+```{r}
+set.seed(12345)
+m1=sample(c("1S","2A","3N","4SB","5MH"),
+          prob=c(0.3,0.35,0.2,0.1,0.05),50,rep=T)
+m1
+```
+
+
+## Resumir los valores obtenidos mediante una tabla de frecuencias incluyendo frecuencias absolutas, frecuencias relativas, porcentajes, y los acumulados de las tres características. 
+    
+```{r}
+tablafre=tibble(valores=m1) %>% 
+  group_by(valores) %>% 
+  summarise(
+    ni=n() # Frecuencias absolutas
+    ) %>% 
+  mutate(
+    fi=ni /length(m1), #Frec rel
+    pi=fi*100, #Porcentajes
+    Ni=cumsum(ni), 
+    Fi=cumsum(fi),#Ni/length(m1)
+    Pi=cumsum(pi) 
+    )
+  
+tablafre %>% 
+  kable(booktabs=TRUE) %>%
+  kable_styling(latex_options = "striped"  )
+```
+
+    
+## Obtener representaciones gráficas adecuadas de las medidas anteriores.
+
+```{r}
+tablafre %>% 
+  ggplot(aes(x=valores , y = ni)) + 
+  geom_col()+ 
+  labs(
+    title = "Diagrama de barras de frecuencias absolutas",
+    subtitle = "Calificaciones",
+    y="Frecuencias absolutas (ni)",
+    x="Calificaciones"
+  )
+```
+
+
+```{r}
+tablafre %>% 
+  ggplot(aes(x=valores , y = fi)) + 
+  geom_col()+ 
+  labs(
+    title = "Diagrama de barras de frecuencias relativas",
+    subtitle = "Calificaciones",
+    y="Frecuencias relativas (fi)",
+    x="Calificaciones"
+  )
+```
+
+
+```{r}
+tablafre %>% 
+  ggplot(aes(x=valores , y = pi)) + 
+  geom_col( color = "pink", fill ="blue")+ 
+  labs(
+    title = "Diagrama de porcentajes",
+    subtitle = "Calificaciones",
+    y="Porcentajes (pi)",
+    x="Calificaciones"
+  )
+```
+```{r}
+tablafre %>% 
+  ggplot(aes(x=valores , y = Fi, group=1)) + 
+ # geom_col(color="blue") +
+ # geom_line(color="pink")+ # Si no pongo group=1 no me hace la representación gráfica. Es para variables continuas
+  geom_step(col="pink")+ #Variables discretas
+  labs(
+    title = "Polígono de Frecuencias rel acumuladas",
+    subtitle = "Calificaciones",
+    y="Frecuencias rel acumuladas (Fi)",
+    x="Calificaciones"
+  )
+```
+
+Diagrama de sectores con el sistema base:
+
+```{r}
+tablafre$fi
+pie(tablafre$ni, labels = tablafre$valores)
+```
+Diagrama de sectores con ggplot2:
+
+```{r}
+tablafre %>% 
+  ggplot(aes(x="",y=pi, fill=factor(valores)))+
+  geom_bar(width = 1, stat = "identity")+ 
+  coord_polar("y",start = 0)+
+  theme_void() +
+  geom_text(aes(label=paste0(valores," - ",         round(pi,2), "%")),
+   position=position_stack(vjust=0.5), size=2 ) + 
+  labs(
+    title = "Diagrama de sectores",
+    fill= "Calificaciones"
+  )
+```
+
+
+
+# Fichero "Familia.txt"
+
+El fichero "Familia.txt" contiene el peso (kgs) y la altura (cms) de los integrantes de una familia.
+
+## Leer en R este fichero y calcular la media y la cuasidesviación típica de cada variable.
+```{r}
+datos2=read.table(file="Familia.txt",sep=" ")
+head(datos2) %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
+```
+
+
+```{r}
+datos2 %>% 
+  summarise(
+    MediaAltura=mean(Altura),
+    MediaPeso = mean(Peso),
+    SdAltura=sd(Altura),
+    SdPeso=sd(Peso)
+  ) %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
+
+```
+Otra forma:
+
+```{r}
+datos2 %>% 
+  summarise_each(
+   c( sd, mean)) %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
+```
+
+
+Otra forma:
+
+```{r}
+datos2 %>% 
+  summarise_all(
+    list(mean,sd)
+  )  %>% 
+kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped")
+```
+
+
+
+## Nube de puntos y recta de mínimos cuadrados
+
+Dibujar la nube de puntos (Peso, Altura) y superponer la recta de mínimos cuadrados. Calcular el coeficiente de correlación lineal entre ambas variables.
+
+Coeficiente de correlación lineal 
+
+```{r}
+datos2 %>% 
+  summarise(
+    Ccirlineal=cor(Peso,Altura) 
+    )-> ccl
+```
+
+
+```{r}
+ggplot(data=datos2, aes(Peso,Altura)) + 
+  geom_point()+
+  geom_smooth(method=lm, se=FALSE, formula = y~x)+  #Quito los IC 
+  labs(
+    title = "Nube de puntos con recta de mínimos cuadrados.",
+    subtitle = paste0("Con coeficiente de correlación lineal, r = " , round(ccl,4)),
+    y="Altura (cm)",
+    x="Peso (kg)" )+
+  theme_linedraw()
+```
+
+
+
+
+## Outliers
+
+¿Qué observación es outlier para la variable peso?  Repetir el apartado anterior sin esa persona.
+```{r}
+res2=boxplot(datos2$Peso)
+res2 # Mirlo las estadísticas del diagrama.
+datos2 %>% 
+  arrange(Peso) %>% 
+  head(1)
+```
+
+```{r}
+datos2new=datos2[-1,]
+```
+
+```{r}
+datos2new %>% 
+  summarise(
+    Ccirlineal=cor(Peso,Altura) 
+    )-> ccl
+```
+
+
+```{r}
+ggplot(data=datos2new, aes(Peso,Altura)) + 
+  geom_point()+
+  geom_smooth(method=lm, se=FALSE, formula = y~x)+  #Quito los IC 
+  labs(
+    title = "Nube de puntos con recta de mínimos cuadrados.",
+    subtitle = paste0("Con coeficiente de correlación lineal, r = " , round(ccl,4)),
+    y="Altura (cm)",
+    x="Peso (kg)" )+
+  theme_linedraw()
+```
+
+
+## IMC
+
+Calcular el Índice de Masa Corporal (IMC), definido como el cociente entre el peso y el cuadrado de la altura (en metros). Representarlo con un gráfico de barras.
+
+```{r}
+dat2imc= datos2 %>% 
+  mutate(IMC=Peso/((Altura/100)^2))
+
+dat2imc %>% 
+  kable(booktabs=TRUE) %>%
+kable_styling(latex_options = "striped")
+```
+
+
+Vamos a definir cuatro intervalos para representar mis datos, empleamos el método del rango intercuartílico.
+
+```{r}
+dat2imc %>% 
+  mutate(
+    IMCargu=cut(IMC,breaks=4)
+  ) %>% ggplot(aes(x=IMCargu))+
+  geom_bar()+
+  labs(
+    
+  x="IMC agrupado",
+  y="Frecuencia",
+  title="Diagrama de barras (IMC agrupado)"
+  )
+```
+
+
+
+
+
+
+## Ordenar
+
+Ordenar los familiares de mayor a menor IMC. 
+
+
+```{r}
+dat2imc %>% 
+  arrange(desc(IMC  ) ) %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped")
+```
+
+
+# Librería *ISwR*
+
+Acceder al fichero alkfos de la librería ISwR:
+
+```{r}
+library(ISwR)
+alkfos %>% 
+  kable(booktabs=TRUE,longtable=T,caption="Fichero alkfos") %>% 
+  kable_styling(latex_options = c("striped","repeat_header"))
+```
+
+
+## Ver los primeros casos y los últimos.
+
+```{r}
+alkfos[c(1,2,3,41,42,43),] %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = "striped", stripe_index = c(1,2,5:6))
+```
+
+
+## Reformatear los datos a la estructura grp time  c id.
+## Ordenar el nuevo formato por grp, id y time, y mostrar las variables en el orden (grp, id, time, c).
+
+```{r}
+
+```
+
+
+
+# Fichero *"dietas.dat"*
+
+Leer el fichero "dietas.dat", donde se distinguen 4 dietas alimenticias, y se mide el peso durante 6 meses. 
+
+```{r}
+dietas=read.table("dietas.dat",sep = " ",col.names = paste0("Dieta_",c(1:7)))
+```
+
+Cada variable toma valores de 1 a 6, a mayor valor más lejos del peso ideal. Representar gráficamente la evolución de los pesos medios según la dieta.
+
+
+```{r}
+medias=c(
+mean(dietas[,1]),
+mean(dietas[,2]),
+mean(dietas[,3]),
+mean(dietas[,4]),
+mean(dietas[,5]),
+mean(dietas[,6]),
+mean(dietas[,7]))
+
+plot(medias)
+
+
+```
+
+
+
+
+
+*En este problema se trabajará con el conjunto de datos Boston de la librería  MASS.*
+
+## Acceder a los datos, en particular, averiguar qué información contiene y cuál es la dimensionalidad de los datos. 
+## Ordenar las variables según el valor absoluto de su coeficiente de correlación lineal con medv (variable a predecir en este conjunto de datos).
+## ¿Destaca algún distrito por su tasa de criminalidad? Similarmente, por los impuestos sobre la propiedad o por la ratio alumnos-profesor.
+## ¿Cuántos distritos son limítrofes con el río? Calcular las medias de crim y medv según chas.
+## Analizar la relación lineal entre lstat y medv.
+
+
+
+
+
+# Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
+
+## Analizar la relación lineal entre las medias y las cuasivarianzas.
+
+## Estudiar gráficamente si los cocientes (n-1)*cuasivar/(sigma^2) siguen una ley chi-cuadrado.
+
+
+
+# Comprobar mediante una simulación el ajuste de  las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
+
+
+
+
+# Fichero *"salarios.txt"*
+
+El fichero "salarios.txt" contiene datos sobre el salario (variable wage) y otras características para 3000 trabajadores.
+
+## Leer en R los datos.
+## Representar gráficamente los salarios según las variables age, year y education, y superponer estimaciones de la media del salario según cada variable.
+## Dibujar la evolución anual del salario medio según el nivel educativo.
+## Calcular los porcentajes de variación interanual del salario medio según nivel educativo.
+## Ordenar el fichero de datos según año (creciente) y edad (decreciente).
+
+
+
+# Librería *MASS*
+
+Acceder al data frame painters de la librería MASS.
+
+## Interpretar y resumir la información contenida en este fichero de datos.
+## Seleccionar las escuelas del renacimiento y Veneciana para los siguientes apartados.
+## Generar en una sola pantalla los diagramas de caja y bigotes según la escuela.
+## Construir nubes de puntos en las que se distinga la escuela.
+## Comparar mediante gráficos de barras las medias de ambas escuelas.
+
+
+
+
