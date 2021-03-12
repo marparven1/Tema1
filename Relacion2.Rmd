@@ -7,7 +7,7 @@ output:
     fig_caption: yes
     number_sections: yes
     toc: yes
-    toc_depth: 2
+    toc_depth: 3
   html_document:
     theme: united
 ---
@@ -377,9 +377,11 @@ datos_dietas_largo=datos_dietas %>%
   ) %>% 
   arrange(Dieta,Mes)
 #L obliga a que el dato sea entero en lugar de numeric, aunque no pasaría nada.
-datos_dietas_largo %>% head() %>% kable()
-
-
+#
+datos_dietas_largo %>% 
+  head() %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling("striped")
 ```
 
 Vamos a calcular los pesos medios, por meses y para cada dieta.
@@ -390,7 +392,9 @@ media_dietas=
   group_by(Dieta,Mes) %>% 
   summarise(PesoMedio=mean(Peso,na.rm=TRUE))
   
-media_dietas %>% kable(booktabs=TRUE) %>% kable_styling("striped")
+media_dietas %>% 
+  kable(booktabs=TRUE,longtable=TRUE) %>%
+  kable_styling("striped")
 ```
 
 Hacemos ahora la representación
@@ -438,7 +442,7 @@ sort(abs(CorB))
 
 ```
 
-## ¿Destaca algún distrito por su tasa de criminalidad? Similarmente, por los impuestos sobre la propiedad o por la ratio alumnos-profesor.
+## Comentarios de variables
 
 ### Tasa de criminalidad
 
@@ -506,12 +510,10 @@ regrelineal=Boston %>%
  dplyr:: select(lstat,medv) %>% 
   lm(formula = lstat~medv)
 regrelineal
-
-
 ```
 
 ```{r}
-summary(regrelineal)
+# summary(regrelineal)
 ```
 
 # Teorema de Fisher
