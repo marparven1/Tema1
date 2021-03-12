@@ -370,6 +370,7 @@ plot(medias)
 # Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
 
 ## Analizar la relación lineal entre las medias y las cuasivarianzas.
+
 ## Estudiar gráficamente si los cocientes (n-1)*cuasivar/(sigma^2) siguen una ley chi-cuadrado.
 
 
