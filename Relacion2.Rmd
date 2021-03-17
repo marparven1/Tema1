@@ -318,7 +318,7 @@ alkfos_fl = alkfos %>%
     cid=as.integer(gsub("c","",cid))
   ) %>%
   select(grp,time,cid)
-View(alkfos_fl)
+# View(alkfos_fl)
 ```
 
 ## Ordenar el nuevo formato por grp, id y time, y mostrar las variables en el orden (grp, id, time, c).
@@ -521,12 +521,274 @@ regrelineal
 Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
 
 ## Analizar la relación lineal entre las medias y las cuasivarianzas.
+```{r}
+set.seed(1234)
+dat6=map_dfc(1:5000, ~rnorm(10))
+dat6[1:6,1:6]
+
+```
+
+Las medias
+
+```{r}
+medias=map_dbl(dat6, mean); head(medias)
+```
+
+Cuasivarianzas
+
+```{r}
+cuasivar= dat6 %>% 
+  map_dbl(var)
+head(cuasivar)
+```
+
+```{r}
+dat6c=tibble(
+  Medias=medias , 
+  Cuasivar= cuasivar
+)
+
+dat6c %>% 
+  head(6) %>% 
+  kable(boojtabs=TRUE) %>% 
+  kable_styling("striped")
+```
+Para el diagrama de dispersión
+```{r}
+dat6c %>% 
+  ggplot(aes(x=Medias , y=Cuasivar))+
+  geom_point()+
+  geom_smooth(method = "lm") # Recta que mejor se adapta a la línea de puntos.
+```
+
+Los puntos crean como un círculo, no existe relación lineal ni tampoco ningún tipo 
+de relación.
+La recta es horizontal, por lo que las variables están incorreladas.
+
+Vamos a calcular el modelo lineal:
+```{r}
+dat6c %>% 
+  lm(formula = Cuasivar~Medias ,data=.) %>%  # El punto coloca lo que está a la izquierda.
+  summary()
+```
+Por tanto, el modelo es el siguiente: $\text{Cuasivar }=0,99-0,0484 \text{ Media}$. Vemos que $R^2 = 0,0008$, por lo que confirmamos la incorrelación e independencia de las variables.
 
 ## Estudiar gráficamente si los cocientes (n-1)\*cuasivar/(sigma\^2) siguen una ley chi-cuadrado.
+```{r}
+dat6c2=dat6c %>% 
+  mutate(
+    cocientes = (10-1)*Cuasivar/(1^2) # Los datos provienen de una Normal(0,1)
+  )          # Mutate añade nuevas columnas
+
+dat6c2 %>% 
+  head(6)
+```
+
+Vamos a representar la *función de densidad* con un histograma:
+
+```{r}
+dat6c2 %>% 
+  ggplot(aes(x=cocientes))+
+  # geom_histogram()+
+  geom_density(color="blue")+
+  stat_function(aes(x=seq(0,40,length.out=5000)),
+               fun = dchisq ,
+               args = list(df=10-1), color="red") # Superpongo la curva de la Chi
+ # geom_function(aes(x=seq(0,40,length.out=5000)), 
+   #             fun = dchisq , 
+   #             args = list(df=10-1), color="red")  
+
+
+
+# Divide el intervalo 40 en 5000 valores
+```
+
+
+
+Lo hacemos para 20 muestras.
+
+```{r}
+set.seed(1234)
+dat6=map_dfc(1:20, ~rnorm(10))
+dat6[1:6,1:6]
+
+```
+
+Las medias
+
+```{r}
+medias=map_dbl(dat6, mean); head(medias)
+```
+
+Cuasivarianzas
+
+```{r}
+cuasivar= dat6 %>% 
+  map_dbl(var)
+head(cuasivar)
+```
+
+```{r}
+dat6c=tibble(
+  Medias=medias , 
+  Cuasivar= cuasivar
+)
+
+dat6c %>% 
+  head(6) %>% 
+  kable(boojtabs=TRUE) %>% 
+  kable_styling("striped")
+```
+Para el diagrama de dispersión
+```{r}
+dat6c %>% 
+  ggplot(aes(x=Medias , y=Cuasivar))+
+  geom_point()+
+  geom_smooth(method = "lm") # Recta que mejor se adapta a la línea de puntos.
+```
+
+Los puntos crean como un círculo, no existe relación lineal ni tampoco ningún tipo 
+de relación.
+La recta es horizontal, por lo que las variables están incorreladas.
+
+Vamos a calcular el modelo lineal:
+```{r}
+dat6c %>% 
+  lm(formula = Cuasivar~Medias ,data=.) %>%  # El punto coloca lo que está a la izquierda.
+  summary()
+```
+Por tanto, el modelo es el siguiente: $\text{Cuasivar }=0,99-0,0484 \text{ Media}$. Vemos que $R^2 = 0,0008$, por lo que confirmamos la incorrelación e independencia de las variables.
+
+## Estudiar gráficamente si los cocientes (n-1)\*cuasivar/(sigma\^2) siguen una ley chi-cuadrado.
+```{r}
+dat6c2=dat6c %>% 
+  mutate(
+    cocientes = (10-1)*Cuasivar/(1^2) # Los datos provienen de una Normal(0,1)
+  )          # Mutate añade nuevas columnas
+
+dat6c2 %>% 
+  head(6)
+```
+
+Vamos a representar la *función de densidad* con un histograma:
+
+```{r}
+dat6c2 %>% 
+  ggplot(aes(x=cocientes))+
+  # geom_histogram()+
+  geom_density(color="blue")+
+  # stat_function(aes(x=seq(0,40,length.out=20)),
+  #              fun = dchisq ,
+  #              args = list(df=10-1), color="red") # Superpongo la curva de la Chi
+ geom_function(aes(x=seq(0,40,length.out=20)),
+             fun = dchisq ,
+             args = list(df=10-1), color="red")
+
+
+
+# Divide el intervalo 40 en 5000 valores
+```
+Vemos que con un tamaño 20 no se ajusta igual.
+
+
+
+
+
+Hay una coincidencia bastante buena, por lo que con una muestra de tamaño 5000, se aproxima bastante.
 
 # Simulaciones
 
 Comprobar mediante una simulación el ajuste de las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
+
+Creamos 10000 muestras de tamaño 10 para la X y de tamaño 8 para la Y.
+
+```{r}
+set.seed(1234)
+n=10000
+nX=10
+mdX=0
+sigmaX=1
+
+nY=8
+mdY=10
+sigmaY=sqrt(3)
+
+dat7_NormalX=map_dfc(1:n , ~rnorm(nX,mean = mdX,sd=sigmaX))
+dat7_NormalY=map_dfc(1:n , ~rnorm(nY,mean = mdY,sd=sigmaY))
+
+```
+
+Vamos a calcular ahora las cuasivarianzas una vez generadas las muestras.
+
+```{r}
+cuasivarX=dat7_NormalX %>% 
+  map_dbl(var)
+cuasivarY=dat7_NormalY %>% 
+  map_dbl(var)
+
+
+F= (cuasivarX/cuasivarY)*(sigmaY^2/sigmaX^2) # Cocientes muestrales que deben seguir una F
+
+ChiX=((nX-1)*cuasivarX)/(sigmaX^2)
+ChiY=((nY-1)*cuasivarY)/(sigmaY^2)
+```
+
+Vamos a ver si se ajustan bien a la teórica:
+
+```{r}
+install.packages("patchwork")
+library(patchwork)
+```
+
+
+
+```{r}
+dat7=tibble(
+  F=F , 
+  ChiX=ChiX , 
+  ChiY=ChiY
+)
+```
+
+
+```{r}
+p1=dat7 %>% 
+  ggplot(aes(x=ChiX))+
+  geom_density(color="blue")+
+  stat_function(aes(x=seq(0,40, length.out=n)), 
+                    fun=dchisq , 
+                    args=list(df=nX-1), 
+                color="red")+ 
+  labs(title="Chi-Cuadrado de Normal(0,1)")
+
+
+p2=dat7 %>% 
+  ggplot(aes(x=ChiY))+
+  geom_density(color="blue")+
+  stat_function(aes(x=seq(0,40, length.out=n)), 
+                    fun=dchisq , 
+                    args=list(df=nY-1), 
+                color="red")+ labs(title="Chi-Cuadrado de Normal(10,3)")
+# F
+
+p3=dat7 %>% 
+  ggplot(aes(x=F))+
+  geom_density(color="blue")+
+  stat_function(aes(x=seq(0,40, length.out=n)), 
+                    fun=df , 
+                    args=list(df1=nX-1, df2=nY-1), 
+                color="red")+ 
+  labs(title="F de Snédecor con 9 y 7 grados de libertad ")
+  
+
+(p1|p2)/p3
+# p1/p2
+# 
+```
+Vemos que todos los modelos se ajustan muy bien.
+
+
+
 
 # Fichero *"salarios.txt"*
 
@@ -534,9 +796,113 @@ El fichero "salarios.txt" contiene datos sobre el salario (variable wage) y otra
 
 ## Leer en R los datos.
 
+```{r}
+salarios=read.table(file="salarios.txt",header = TRUE,sep = " ") # SEP no es necesario, ya que read.table trae por defecto este separador.
+salarios %>% 
+  head() %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(latex_options = c("striped", "scale_down"))
+
+salarios %>% glimpse()
+```
+
+
 ## Representar gráficamente los salarios según las variables age, year y education, y superponer estimaciones de la media del salario según cada variable.
 
+Edad 
+
+```{r}
+salarios %>% 
+  ggplot(aes(x=age , y=wage))+
+  geom_boxplot(aes(group=age), colour="lightblue")+
+  scale_x_continuous(breaks=seq(0,90,by=5))+ # Voy a manipular el EJE X
+  geom_smooth() # Para ver la tendencia. Para cada edad, representa el valor medio. Añade un IC, que se puede eliminar con la instrucción SE=FALSE
+  # geom_smooth(method = "lm") # Con la recta de regresión
+```
+
+
+Con diagrama de puntos en vez de caja y bigote:
+```{r}
+p8.1=salarios %>% 
+  ggplot(aes(x=age , y=wage))+
+  geom_point(aes(group=age), colour="lightblue")+
+  scale_x_continuous(breaks=seq(0,90,by=5))+ # Voy a manipular el EJE X
+  geom_smooth() # Para ver la tendencia. Para cada edad, representa el valor medio. Añade un IC, que se puede eliminar con la instrucción SE=FALSE
+  # geom_smooth(method = "lm") # Con la recta de regresión
+p8.1
+```
+No tenemos el cálculo de la mediana de forma directa aquí. Podríamos calcular por cada edad la media, mediana,... y pintarlo.
+
+
+```{r}
+part01=split(salarios,salarios$age) # Lista de 61 elementos, cada elemento tiene información para cada edad 
+dat8a= tibble(
+  edades=as.numeric(names(part01)),
+  medias = part01 %>% map_dbl(~mean(.x$wage, na.rm=T)), # Cada una de las listas de part01 y el contenido de cada lista es un dataframe. Del dataframe quiero la media de la columna salario
+  medianas=part01 %>% map_dbl(~median(.x$wage, na.rm=T))
+)
+dat8a %>% head()
+```
+
+Para representar la evolución, superponemos al gráfico anterior:
+
+```{r}
+p8.1+
+  geom_line(data = dat8a, aes(x=edades,y=medias), color="red")+
+  geom_line(data = dat8a, aes(x=edades,y=medianas), color="green")
+```
+
+
+Año
+
+```{r}
+salarios %>% 
+  ggplot(aes(x=year , y=wage))+
+  geom_boxplot(aes(group=year), colour="lightpink")+
+  scale_x_continuous(breaks=seq(2003,2009,by=5))+ # Voy a manipular el EJE X
+  geom_smooth() # Para ver la tendencia. Para cada edad, representa el valor medio. Añade un IC, que se puede eliminar con la instrucción SE=FALSE
+  # geom_smooth(method = "lm") # Con la recta de regresión
+```
+
+Nivel de educación 
+
+```{r}
+salarios %>% 
+  ggplot(aes(x=education , y=wage))+
+  geom_boxplot(aes(group=education), colour="lightyellow")+
+  # scale_x_continuous(breaks=seq(2003,2009,by=5))+ # Voy a manipular el EJE X
+  geom_smooth() # Para ver la tendencia. Para cada edad, representa el valor medio. Añade un IC, que se puede eliminar con la instrucción SE=FALSE
+  # geom_smooth(method = "lm") # Con la recta de regresión
+```
+
 ## Dibujar la evolución anual del salario medio según el nivel educativo.
+
+```{r}
+salario_med_nivel_educ=salarios %>% 
+  group_by(year, education) %>% # Porque esevolución ANUAL
+  summarise(MedSalario=mean(wage,na.rm=TRUE))
+
+salario_med_nivel_educ %>% 
+  ggplot(aes(x=year , y=MedSalario, group=education))+
+  geom_line(aes(color=education))+
+  geom_point()+
+  scale_x_continuous(breaks=2003:2009)+
+  labs(
+    title="Evolución del salario medio anual según nivel educativo",
+    x="Calendario",
+    y="Salario Medio",
+    color="Nivel educativo" # Porque he dicho en geom_line aes(color=)
+  )
+
+```
+Parece que el comportamiento es parecido, pero a mayor nivel de educación, mayor es el salario.
+
+Lo paso a formato ancho:
+```{r}
+
+```
+
+
 
 ## Calcular los porcentajes de variación interanual del salario medio según nivel educativo.
 
@@ -555,3 +921,4 @@ Acceder al data frame painters de la librería MASS.
 ## Construir nubes de puntos en las que se distinga la escuela.
 
 ## Comparar mediante gráficos de barras las medias de ambas escuelas.
+
