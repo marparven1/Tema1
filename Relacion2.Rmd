@@ -897,28 +897,170 @@ salario_med_nivel_educ %>%
 ```
 Parece que el comportamiento es parecido, pero a mayor nivel de educación, mayor es el salario.
 
-Lo paso a formato ancho:
-```{r}
-
-```
-
 
 
 ## Calcular los porcentajes de variación interanual del salario medio según nivel educativo.
 
+```{r}
+salario_med_nivel_educ %>% 
+  head()
+```
+Salario medio de un año y le divido el salario medio del año anterior:
+
+  - 1: no hay variación
+  - 1.10: 10\% de variación (crecimiento)
+  - 0.90: Ha disminuido un 90%.
+  
+Vamos a preparar los datos para que sea más fácil:
+
+```{r}
+salario_med_nivel_educ %>% 
+  group_by(education) %>% 
+  mutate(año_anterior= lag(year,1), # Al agrupar por nivel de educación, calcula el salario medio y le asocia en una nueva variable el año anterior.
+         MedSalAct= MedSalario,
+         MedSalAnt=lag(MedSalario,1)) %>% # 1 es una posición
+  head(15) 
+
+# Si fuera mes, sería 12
+```
+
+Calculamos lo que nos piden:
+
+```{r}
+Var_Interanual=salario_med_nivel_educ %>% 
+  group_by(education) %>% 
+  mutate(año_anterior= lag(year,1), 
+         MedSalAct= MedSalario,
+         MedSalAnt=lag(MedSalario,1),
+         Cociente = MedSalAct/MedSalAnt,
+         IncrAnualPorc=round(Cociente*100-100,2)
+         ) %>% 
+  filter(year !=2003 )
+```
+
+```{r}
+head(Var_Interanual) %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(c("striped","scale_down"))
+```
+Vamos a representarlo grñaficamente:
+
+```{r}
+g1=Var_Interanual %>% 
+  ggplot(aes(x=year,y=IncrAnualPorc)) +
+  geom_line(aes(color=education))+
+  scale_y_continuous(breaks = seq(-10,10,by=2),
+                     labels =paste0( seq(-10,10,by=2), "%"))+
+  labs(
+    title="Variación interanual del salario según nivel educativo",
+          y="Porcentajes",
+          x="Años",
+          color="Nivel educación")
+
+g1
+```
+**Interpretación**
+
+```{r}
+ggplot2::ggsave(filename = "gg1_visalario.png")
+```
+
+
 ## Ordenar el fichero de datos según año (creciente) y edad (decreciente).
+
+```{r}
+salarios %>% 
+  arrange(year, desc(age)) %>% 
+  head() %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling(c("scale_down","striped"))
+```
+
+
 
 # Librería *MASS*
 
 Acceder al data frame painters de la librería MASS.
 
+```{r}
+painter=MASS::painters
+glimpse(painter)
+?MASS::painters
+```
+
+
 ## Interpretar y resumir la información contenida en este fichero de datos.
+
 
 ## Seleccionar las escuelas del renacimiento y Veneciana para los siguientes apartados.
 
+
+```{r}
+dat9=painter %>% 
+  filter(School %in% c("A","D")) %>% 
+  mutate(
+    School= ifelse(School=="A","Renacimiento","Veneciana")
+  )
+view(dat9)
+# También se puede hacer con recode y case when. 
+# ¡¡¡HACER!!!
+```
+
+
+
+
 ## Generar en una sola pantalla los diagramas de caja y bigotes según la escuela.
 
+```{r}
+p1=
+ggplot(dat9) +
+ aes(y = Composition, x="", fill = School) +
+ geom_boxplot() +
+ scale_fill_hue() +
+    labs(title="Boxplot para Composición")+
+ theme_minimal()
+
+p2=ggplot(dat9) +
+ aes(y = Drawing, x="", fill = School) +
+ geom_boxplot() +
+ scale_fill_hue() +
+    labs(title="Boxplot para Dibujo")+
+ theme_minimal()
+
+p3=ggplot(dat9) +
+ aes(y = Colour, x="", fill = School) +
+ geom_boxplot() +
+ scale_fill_hue() +
+    labs(title="Boxplot para Color")+
+ theme_minimal()
+
+p4=ggplot(dat9) +
+ aes( x=" ",y = Expression, fill = School) +
+ geom_boxplot() +
+ scale_fill_hue() +
+  labs(title="Boxplot para Expresión")+
+ theme_minimal()
+
+library(patchwork)
+(p1|p2)/(p3|p4)
+
+```
+
+
 ## Construir nubes de puntos en las que se distinga la escuela.
+```{r}
+dat9 %>% 
+  ggplot(aes(x= Composition, y= Drawing, fill=School,colour=School))+
+  geom_point()
+```
+
 
 ## Comparar mediante gráficos de barras las medias de ambas escuelas.
+
+```{r}
+dat9b=dat9
+dat9b$Nombres=rownames(dat9)
+rownames(painter)
+```
+
 
