@@ -1055,12 +1055,93 @@ dat9 %>%
 ```
 
 
+
+
+```{r}
+dat9b=painter %>% 
+  filter(School %in% c("A","D")) %>% 
+  mutate(School= ifelse(School=="A","Renacimiento","Veneciana"),
+         Nombres=rownames(.))
+
+```
+
+```{r}
+install.packages("ggrepel")
+library(ggrepel)
+```
+
+
+```{r}
+dat9b %>% 
+  ggplot(aes(x=Composition,y=Drawing, color=School, label=Nombres))+
+  geom_point()+
+#  geom_text() Al añadir la nueva librería puedo usar la siguiente función
+# geom_text_repel() # Separa las coincidencias
+  geom_label_repel() # Mejora aún la presentación de geom_text_repel
+```
+
+Este gráfico lo puedo hacer para todas las parejas, no solo composción y dibujo.
+
+Vamos a intentarlo hacerlo con todos y así no tener que usar Patchword
+
+
+
+
+```{r}
+library(GGally)
+dat9 %>% 
+  ggpairs(colums=1:4, mapping = ggplot2::aes(colour=School))
+```
+
+
+
 ## Comparar mediante gráficos de barras las medias de ambas escuelas.
 
 ```{r}
-dat9b=dat9
-dat9b$Nombres=rownames(dat9)
-rownames(painter)
+dat9c=dat9 %>% 
+  group_by(School) %>% 
+  summarise(
+    Composición=mean(Composition,na.rm=TRUE),
+    Drawing=mean(Drawing,na.rm=TRUE),
+    Color=mean(Colour,na.rm=TRUE),
+    Expression=mean(Expression,na.rm=TRUE)
+  )
+dat9c
+```
+Para ggplot los necesitamos en formato largo, es decir, queremos las variables, las escuelas y los datos en columnasd.
+
+```{r}
+dat9cLargo=
+  dat9c %>% 
+  pivot_longer(names_to = "Variables",values_to = "Medias",
+              cols=-School) # names_to  son: School , composición,...
+
+dat9cLargo %>% 
+  kable(booktabs=TRUE) %>% 
+  kable_styling("striped")
 ```
 
+
+Vamos a hacer el gráfico.
+
+```{r}
+uno=dat9cLargo %>% 
+  ggplot(aes(x=Variables,y=Medias,fill=School))+
+  geom_col(position="dodge")+
+  geom_text(aes(label=Medias), 
+             size=4, hjust=0.5,vjust=-0.25,
+             position=position_dodge(width = 1), color="blue"  )+
+  labs(
+    title="Comparación de Medias según la escuela",
+    x="",
+    y="Puntuación media",
+    fill="Escuela"
+  )+
+  ggthemes::theme_economist()
+dos=dat9cLargo %>% 
+  ggplot(aes(x=Variables,y=Medias,fill=School))+
+  geom_col()
+uno
+uno/dos # Ver con dodge que ya no aparecen apiladas
+```
 
