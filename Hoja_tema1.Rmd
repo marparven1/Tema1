@@ -3,19 +3,27 @@ title: "Hoja 1 de problemas y prácticas con R"
 author: "Departamento de Estadística e Investigación Operativa. Universidad de Sevilla"
 subtitle: Estadística Computacional I. Grado en Estadística
 output:
-  pdf_document: default
-  html_document: default
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+  html_document:
+    self_contained: false
+    theme: united
+    highlight: textmate
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
+# Ejercicio 1
 
 1. Crear un vector donde se repitan los códigos provinciales de Andalucía: 10 veces Almería, 10 veces Cádiz, ..., 10 veces Jaén, 15 para Málaga y 18 Sevilla. Permutar aleatoriamente los elementos de dicho vector y calcular la tabla de frecuencias.
 
-**Solución**:
+## **Solución**:
 
 ```{r}
 codigos=c(4,11,14,18,21,23,29,41)
@@ -30,7 +38,7 @@ set.seed(1)
 codrepetidospermutados=sample(codigosrepetidos)
 codrepetidospermutados
 ```
-**Solución**:
+
 
 ```{r}
 table(codrepetidospermutados)
@@ -49,11 +57,11 @@ codigosrepetidos %>%
   table()
 ```
 
-
+# Ejercicio 2
 
 2. Con la ayuda de paste, crear un vector de nombres "Caso_1",...,"Caso_30".
 
-**Solución**:
+## **Solución**:
 
 ```{r}
 paste("Caso_",1:30, sep = "")
@@ -71,15 +79,15 @@ ve2[i]= paste("Caso_",i)
 }
  ve2
 ```
-
+# Ejercicio 3
 
 3. Generar dos vectores de tamaño 250, seleccionando aleatoriamente números enteros entre 0 y 999, sean x e y los vectores resultantes.
 
 
 
-    i)	Visualizarlos en dos columnas.
+### Visualizarlos en dos columnas.
     
-**Solución**: 
+
 
 
 ```{r}
@@ -103,7 +111,7 @@ xyt= tibble(
 head(xyt,10) # Creo un objeto tible
 ```
 
-    ii)	Construir el vector
+### Construir el vector
     
 $y_2-x_1,\ldots,y_{250}-x_{249}$.
     
@@ -135,7 +143,7 @@ pull(v2) %>% # Me quedo con la columna v2 en formato vector
 ```
 
     
-    iii) Generar el vector
+### Generar el vector
     
 $y_2-y_1,\ldots,y_{250}-y_{249}$.
   
@@ -164,7 +172,7 @@ pull(v2) %>% # Me quedo con la columna v2 en formato vector
     
     
     
-    iv)	Construir el vector
+### Construir el vector
     
 $x_1+2x_2-x_3,x_2+2x_3-x_4,...,x_{248}+2x_{249}-x_{250}$.
 
@@ -187,7 +195,7 @@ xyt %>%
 ```
 
 
-    v)	Calcular la suma de los valores
+### Calcular la suma de los valores
     
 $\frac{1}{(x_i+y_i)}$
 
@@ -196,13 +204,13 @@ sum(1/(x+y))
 ```
 
 
+# Ejercicio 4
 
+4.Continuando con los vectores x e y anteriores:
 
-4.	Continuando con los vectores x e y anteriores:
+## **Solución**:
 
-**Solución**:
-
-    i)	Determinar las posiciones y valores de los $y_i>600$.
+### Determinar las posiciones y valores de los $y_i>600$.
     
 ```{r}
 cbind(which(y>600), y[which(y>600)]) %>% 
@@ -221,7 +229,7 @@ xyt %>%
  
  
     
-    ii)	Construir una matriz con las posiciones y valores anteriores, y con los valores de x en esas posiciones.
+### Construir una matriz con las posiciones y valores anteriores, y con los valores de x en esas posiciones.
   
 ```{r}
 xyt %>% 
@@ -233,7 +241,7 @@ xyt %>%
 ```
 
     
-    iii)	Guardar las posiciones como nombres de filas de la matriz anterior.
+### Guardar las posiciones como nombres de filas de la matriz anterior.
     
 ```{r}
 xyt %>% 
@@ -248,7 +256,8 @@ xytmat %>% head()
 ```
     
     
-    iv)	Construir el vector $|x_1-xmedia|^{1/2}$,....,$|x_n-xmedia|^{1/2}$.
+### Construir el vector
+$|x_1- \overline{x}|^{1/2}$,....,$|x_n-\overline{x}|^{1/2}$.
     
 ```{r}
 (xmedia = mean(x))
@@ -257,7 +266,7 @@ abs(x-xmedia)^(1/2)
   
   
     
-    v)	Calcular el número de elementos de y que distan menos de 200 del máximo de y.
+### Calcular el número de elementos de y que distan menos de 200 del máximo de y.
     
 ```{r}
 length(which(abs(y-max(y))<200))
@@ -276,7 +285,7 @@ xyt %>%
 ```
     
     
-    vi)	¿Cuántos elementos de x son pares?
+### ¿Cuántos elementos de x son pares?
     
 ```{r}
 length(which((x %% 2)==0))
@@ -291,7 +300,7 @@ xyt %>%
   
   
     
-    vii)	Seleccionar los elementos de x en posiciones donde y sea múltiplo de 5.
+### Seleccionar los elementos de x en posiciones donde y sea múltiplo de 5.
     
     
 ```{r}
@@ -310,7 +319,7 @@ Otra forma
 x[(y%%5)==0]
 ```
     
-    viii)	Ordenar los elementos de x según la ordenación creciente de y.
+### Ordenar los elementos de x según la ordenación creciente de y.
 
 
 ```{r}
@@ -321,12 +330,12 @@ xyt %>%
 ```
 
 
+# Ejercicio 5
 
 
+5.Calcular $1+ (1+2) + ...+ (1+2+3+...+10)$.
 
-5.	Calcular $1+ (1+2) + ...+ (1+2+3+...+10)$.
-
-**Solución**:
+## **Solución**:
 
 ```{r}
 # cumsum(1:10) Cada uno de los sumandos del ejercicio
@@ -336,13 +345,13 @@ cumsum(1:10) %>%
 # Otra forma:
 # sum(cumsum(1:10)) 
 ```
-
+# Ejercicio 6
 
 6.	Calcular: 
 
 $1+ (2/3) + (2/3)(4/5)+(2/3)(4/5)(6/7)+...+ ( (2/3)(4/5)(6/7)...(38/39) )$.
 
-**Solución**:
+## **Solución**:
 
 ```{r}
 v6=c(1,seq(2,38,by=2)/seq(3,39, by=2))
@@ -350,11 +359,11 @@ v6
 cumprod(v6) %>% 
   sum()
 ```
-
+# Ejercicio 7
 
 7.	Construir una matriz n x n con 0 en la diagonal, +1 en la mitad triangular superior y -1 en la mitad triangular inferior.
 
-**Solución**:
+## **Solución**:
 
 ```{r}
 m1<-diag(0,10,10) 
@@ -362,11 +371,11 @@ m1[lower.tri(m1)] <- -1
 m1[upper.tri(m1)] <- 1
 m1
 ```
-
+# Ejercicio 8
 
 8.	Construir una matriz con la tabla de multiplicar.
 
-**Solución**:
+## **Solución**:
 
 ```{r}
 numeros=c(1:10)
@@ -428,9 +437,11 @@ tabla1=tibble(f1=1:10) %>%
     tabla10=f1*10
     )
 ```
-
+# Ejercicio 9 
 
 9.	Construir una matriz 6x9 con enteros aleatorios en 1, ..., 10.
+
+## **Solución**:
 
 ```{r}
 set.seed(12345)
@@ -438,7 +449,7 @@ matriz=matrix(data = sample(1:10,size = 54,replace = T),nrow = 6,ncol = 9)
 matriz
 ```
 
-    i) Calcular la suma de cada fila, visualizarlo en una nueva columna.
+### Calcular la suma de cada fila, visualizarlo en una nueva columna.
     
 ```{r}
 colSums(matriz)
@@ -447,7 +458,7 @@ m2
 ```
 
     
-    ii)	Calcular el máximo de cada columna, visualizarlo en una fila nueva.
+### Calcular el máximo de cada columna, visualizarlo en una fila nueva.
     
 ```{r}
 maximos=c(
@@ -464,7 +475,7 @@ mat_max
 ```
     
     
-    iii) Calcular el producto matricial de A por su traspuesta.
+### Calcular el producto matricial de A por su traspuesta.
 
 
 ```{r}

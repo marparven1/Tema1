@@ -550,7 +550,7 @@ dat6c=tibble(
 
 dat6c %>% 
   head(6) %>% 
-  kable(boojtabs=TRUE) %>% 
+  kable(booktabs=TRUE) %>% 
   kable_styling("striped")
 ```
 Para el diagrama de dispersión
@@ -636,7 +636,7 @@ dat6c=tibble(
 
 dat6c %>% 
   head(6) %>% 
-  kable(boojtabs=TRUE) %>% 
+  kable(booktabs=TRUE) %>% 
   kable_styling("striped")
 ```
 Para el diagrama de dispersión
@@ -680,11 +680,9 @@ dat6c2 %>%
   # stat_function(aes(x=seq(0,40,length.out=20)),
   #              fun = dchisq ,
   #              args = list(df=10-1), color="red") # Superpongo la curva de la Chi
- geom_function(aes(x=seq(0,40,length.out=20)),
+  geom_function(aes(x=seq(0,40,length.out=20)),
              fun = dchisq ,
              args = list(df=10-1), color="red")
-
-
 
 # Divide el intervalo 40 en 5000 valores
 ```
