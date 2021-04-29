@@ -3,13 +3,16 @@ title: "Hoja 2 de problemas y prácticas con R"
 author: "Departamento de Estadística e Investigación Operativa. Universidad de Sevilla"
 subtitle: Estadística Computacional I. Grado en Estadística
 output:
+  html_document:
+    theme: united
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
   pdf_document: 
     fig_caption: yes
     number_sections: yes
     toc: yes
     toc_depth: 3
-  html_document:
-    theme: united
 ---
 
 ```{r setup, include=FALSE}
@@ -734,7 +737,7 @@ ChiY=((nY-1)*cuasivarY)/(sigmaY^2)
 Vamos a ver si se ajustan bien a la teórica:
 
 ```{r}
-install.packages("patchwork")
+# install.packages("patchwork")
 library(patchwork)
 ```
 
@@ -1046,6 +1049,9 @@ library(patchwork)
 
 
 ## Construir nubes de puntos en las que se distinga la escuela.
+
+
+
 ```{r}
 dat9 %>% 
   ggplot(aes(x= Composition, y= Drawing, fill=School,colour=School))+
@@ -1064,7 +1070,7 @@ dat9b=painter %>%
 ```
 
 ```{r}
-install.packages("ggrepel")
+# install.packages("ggrepel")
 library(ggrepel)
 ```
 
@@ -1142,4 +1148,11 @@ dos=dat9cLargo %>%
 uno
 uno/dos # Ver con dodge que ya no aparecen apiladas
 ```
+
+
+
+
+
+
+
 

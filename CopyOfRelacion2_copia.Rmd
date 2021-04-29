@@ -10,6 +10,9 @@ output:
     toc_depth: 2
   html_document:
     theme: united
+    toc: yes
+    toc_depth: 2
+    number_sections: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -367,7 +370,8 @@ plot(medias)
 
 
 
-# Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
+# Teorema de Fisher
+Comprobar empíricamente el Teorema de Fisher a partir de 5000 muestras de tamaño 10 de una ley N(0,1):
 
 ## Analizar la relación lineal entre las medias y las cuasivarianzas.
 
@@ -375,7 +379,8 @@ plot(medias)
 
 
 
-# Comprobar mediante una simulación el ajuste de  las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
+# Simulacion
+Comprobar mediante una simulación el ajuste de  las distribuciones chi-cuadrado y la distribución F-Snedecor a partir de las cuasivarianzas muestrales para 10000 pares de muestras independientes. En cada par, la primera muestra será de tamaño 10 de la ley N(0,1), y la segunda muestra de tamaño 8 de la ley N(10,3).
 
 
 
@@ -401,6 +406,14 @@ Acceder al data frame painters de la librería MASS.
 ## Generar en una sola pantalla los diagramas de caja y bigotes según la escuela.
 ## Construir nubes de puntos en las que se distinga la escuela.
 ## Comparar mediante gráficos de barras las medias de ambas escuelas.
+
+
+
+
+
+
+
+
 
 
 
