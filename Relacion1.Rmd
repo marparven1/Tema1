@@ -1,0 +1,487 @@
+---
+title: "Hoja 1 de problemas y prácticas con R"
+author: "Marta Venegas Pardo"
+subtitle: Estadística Computacional I. Grado en Estadística
+output:
+  html_document:
+    theme: united
+    highlight: textmate
+    toc: true
+    toc_depth: 3
+    number_sections: true
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Ejercicio 1
+
+1. Crear un vector donde se repitan los códigos provinciales de Andalucía: 10 veces Almería, 10 veces Cádiz, ..., 10 veces Jaén, 15 para Málaga y 18 Sevilla. Permutar aleatoriamente los elementos de dicho vector y calcular la tabla de frecuencias.
+
+## **Solución**:
+
+```{r}
+codigos=c(4,11,14,18,21,23,29,41)
+#acceder a elementos:
+codigosrepetidos=rep(codigos,c(rep(10,6),15,18))
+```
+
+
+
+```{r}
+set.seed(1)
+codrepetidospermutados=sample(codigosrepetidos)
+codrepetidospermutados
+```
+
+
+```{r}
+table(codrepetidospermutados)
+Provincias =c("Almería","Cádiz","Jaén","Granada","Córdoba","Huelva","Málaga","Sevilla")
+#table(factor(codrepetidospermutados),labels=Provincias)
+```
+
+
+
+Otra forma, con el paquete tidyverse.
+
+```{r}
+set.seed(1)
+codigosrepetidos %>% 
+  sample() %>% 
+  table()
+```
+
+# Ejercicio 2
+
+2. Con la ayuda de paste, crear un vector de nombres "Caso_1",...,"Caso_30".
+
+## **Solución**:
+
+```{r}
+paste("Caso_",1:30, sep = "")
+# Formas equivalentes:
+  # paste0("Caso_",1:30)
+  # paste("Caso",1:30, sep = "_")
+```
+
+ Con un bucle `for`, pero se recomiendo no usarlo por ser mucho más lento en general.
+ 
+```{r}
+ve2=c()
+for (i in 1:30) {
+ve2[i]= paste("Caso_",i)
+}
+ ve2
+```
+# Ejercicio 3
+
+3. Generar dos vectores de tamaño 250, seleccionando aleatoriamente números enteros entre 0 y 999, sean x e y los vectores resultantes.
+
+
+
+### Visualizarlos en dos columnas.
+    
+
+
+
+```{r}
+set.seed(1357) #semilla del generador
+n=250
+x=sample(0:999, size = n, replace = T) #Extracción con reemplazamiento. 
+y=sample(0:999, size = n, replace = T)
+xy=cbind(x,y) # Es una matriz
+head(xy,10)
+```
+
+Otro modo, con la librería tidyverse:
+
+```{r}
+set.seed(1357) #semilla del generador
+n=250
+xyt= tibble(
+  x= sample(0:999,n, replace = T),
+  y= sample(0:999,n, replace = T))
+
+head(xyt,10) # Creo un objeto tible
+```
+
+### Construir el vector
+    
+$y_2-x_1,\ldots,y_{250}-x_{249}$.
+    
+Vemos que la y va adelantada un lugar.
+
+```{r}
+v2=y[2:n]-x[1:(n-1)]
+v2
+# Otra forma 
+# y[-1]-x[-n]
+```
+
+Otra forma:
+
+```{r}
+head(cbind(y[-1],x[-n],y[-1]-x[-n]),10)
+```
+Con el sistema tidyverse:
+
+```{r}
+xyt %>% 
+  mutate(
+    t1=lead(y,n=1),
+    t2=x , 
+    v2=t1-t2
+  ) %>% 
+pull(v2) %>% # Me quedo con la columna v2 en formato vector
+  head(10)
+```
+
+    
+### Generar el vector
+    
+$y_2-y_1,\ldots,y_{250}-y_{249}$.
+  
+```{r}
+v3=y[-1]-y[-n]
+head(v3,10)
+```
+ 
+Otra forma 
+    
+```{r}
+head(cbind(y[-1],y[-n],y[-1]-y[-n]),10)
+```
+   
+
+```{r}
+xyt %>% 
+  mutate(
+    t1=lead(y,n=1),
+    t2=y , 
+    v2=t1-t2
+  ) %>% 
+pull(v2) %>% # Me quedo con la columna v2 en formato vector
+  head(10)
+```
+    
+    
+    
+### Construir el vector
+    
+$x_1+2x_2-x_3,x_2+2x_3-x_4,...,x_{248}+2x_{249}-x_{250}$.
+
+```{r}
+v4=x[1:248]+2*x[2:249]-x[3:250]
+v4
+```
+Otra forma:
+
+```{r}
+xyt %>% 
+  mutate(
+    t1=x,
+    t2=lead(x,n=1), # Empieza por el 2º
+    t3=lead(x,n=2), # Empieza por el 3º
+    v3= t1+2*t2-t3
+  ) %>% 
+  pull(v3) %>% 
+  head(10)
+```
+
+
+### Calcular la suma de los valores
+    
+$\frac{1}{(x_i+y_i)}$
+
+```{r}
+sum(1/(x+y))
+```
+
+
+# Ejercicio 4
+
+4.Continuando con los vectores x e y anteriores:
+
+## **Solución**:
+
+### Determinar las posiciones y valores de los $y_i>600$.
+    
+```{r}
+cbind(which(y>600), y[which(y>600)]) %>% 
+  head(10)
+```
+Sistema tidyverse:
+
+```{r}
+xyt %>% 
+  mutate(posicion = row_number()) %>% 
+  filter(y>600) %>% 
+  select(posicion , y) %>% 
+  head(10)
+```
+
+ 
+ 
+    
+### Construir una matriz con las posiciones y valores anteriores, y con los valores de x en esas posiciones.
+  
+```{r}
+xyt %>% 
+  mutate(posicion = row_number()) %>% 
+  filter(y>600) %>% 
+  select(posicion , x) %>% 
+  as.matrix() %>% 
+  head(10)
+```
+
+    
+### Guardar las posiciones como nombres de filas de la matriz anterior.
+    
+```{r}
+xyt %>% 
+  mutate(posicion = row_number()) %>% 
+  filter(y>600) %>% 
+  select(posicion ,y, x) %>% 
+  as.matrix()->xytmat
+
+rownames(xytmat)= xytmat[,1]
+xytmat=xytmat[,-1] 
+xytmat %>% head()
+```
+    
+    
+### Construir el vector
+$|x_1- \overline{x}|^{1/2}$,....,$|x_n-\overline{x}|^{1/2}$.
+    
+```{r}
+(xmedia = mean(x))
+abs(x-xmedia)^(1/2)
+```
+  
+  
+    
+### Calcular el número de elementos de y que distan menos de 200 del máximo de y.
+    
+```{r}
+length(which(abs(y-max(y))<200))
+```
+    
+```{r}
+xyt %>% 
+  mutate(
+    distancia=abs(y-max(y))
+  ) %>% 
+  filter(distancia<200) %>% 
+  count()
+#  summarise(
+#    cuantos = n() )
+
+```
+    
+    
+### ¿Cuántos elementos de x son pares?
+    
+```{r}
+length(which((x %% 2)==0))
+```
+  
+```{r}
+xyt %>% 
+  filter((x %% 2)==0) %>% 
+  count()
+# La expresión `x %% 2` es módulo. Calcula cual es el resto de la división.
+```
+  
+  
+    
+### Seleccionar los elementos de x en posiciones donde y sea múltiplo de 5.
+    
+    
+```{r}
+xyt %>% 
+  mutate( Resto=(y %% 5)==0) %>% 
+  filter(Resto==TRUE) %>% 
+  pull(x)
+
+# Otra forma: 
+    #xyt %>%  filter ((y%%5) ==0) %>%  pull(x)
+```
+
+Otra forma 
+
+```{r}
+x[(y%%5)==0]
+```
+    
+### Ordenar los elementos de x según la ordenación creciente de y.
+
+
+```{r}
+xyt %>%  
+  arrange(y) %>% 
+  pull(x) %>% 
+  head(10)
+```
+
+
+# Ejercicio 5
+
+
+5.Calcular $1+ (1+2) + ...+ (1+2+3+...+10)$.
+
+## **Solución**:
+
+```{r}
+# cumsum(1:10) Cada uno de los sumandos del ejercicio
+cumsum(1:10) %>% 
+  sum()
+
+# Otra forma:
+# sum(cumsum(1:10)) 
+```
+# Ejercicio 6
+
+6.	Calcular: 
+
+$1+ (2/3) + (2/3)(4/5)+(2/3)(4/5)(6/7)+...+ ( (2/3)(4/5)(6/7)...(38/39) )$.
+
+## **Solución**:
+
+```{r}
+v6=c(1,seq(2,38,by=2)/seq(3,39, by=2))
+v6
+cumprod(v6) %>% 
+  sum()
+```
+# Ejercicio 7
+
+7.	Construir una matriz n x n con 0 en la diagonal, +1 en la mitad triangular superior y -1 en la mitad triangular inferior.
+
+## **Solución**:
+
+```{r}
+m1<-diag(0,10,10) 
+m1[lower.tri(m1)] <- -1
+m1[upper.tri(m1)] <- 1
+m1
+```
+# Ejercicio 8
+
+8.	Construir una matriz con la tabla de multiplicar.
+
+## **Solución**:
+
+```{r}
+numeros=c(1:10)
+m=matrix(1:10,nrow=10,ncol=10)
+m[1,]=numeros
+
+diag(m)=diag(m)^2
+
+m[-c(1,2),2]=2*m[-c(1,2),2]
+m[-c(1,3),3]=3*m[-c(1,3),3]
+m[-c(1,4),4]=4*m[-c(1,4),4]
+m[-c(1,5),5]=5*m[-c(1,5),5]
+m[-c(1,6),6]=6*m[-c(1,6),6]
+m[-c(1,7),7]=7*m[-c(1,7),7]
+m[-c(1,8),8]=8*m[-c(1,8),8]
+m[-c(1,9),9]=9*m[-c(1,9),9]
+m[-c(1,10),10]=10*m[-c(1,10),10]
+m
+```
+Otro caso:
+
+```{r}
+matriz8 = function(n,k){
+ m = matrix(rep(1,n*k),nrow = n,ncol = k)
+ for (i in 1:n) {
+   for (j in 1:k) {
+     m[i,j] = i*j
+   }
+ }
+ return(m)
+}
+matriz8(10,10)
+```
+Otra forma:
+
+```{r}
+i=1:9
+j=1:9
+
+A=outer(i,j,"*")
+colnames(A)=paste("*",1:9,sep="")
+rownames(A)=1:9
+A
+```
+Con el sistema tidyverse:
+
+```{r}
+tabla1=tibble(f1=1:10) %>% 
+  mutate(
+    tabla1= f1*1,
+    tabla2=f1*2,
+    tabla3=f1*3,
+    tabla4=f1*4,
+    tabla5=f1*5,
+    tabla6=f1*6,
+    tabla7=f1*7,
+    tabla8=f1*8,
+    tabla9=f1*9,
+    tabla10=f1*10
+    )
+```
+# Ejercicio 9 
+
+9.	Construir una matriz 6x9 con enteros aleatorios en 1, ..., 10.
+
+## **Solución**:
+
+```{r}
+set.seed(12345)
+matriz=matrix(data = sample(1:10,size = 54,replace = T),nrow = 6,ncol = 9)
+matriz
+```
+
+### Calcular la suma de cada fila, visualizarlo en una nueva columna.
+    
+```{r}
+colSums(matriz)
+m2=cbind(matriz,sumas=rowSums(matriz))
+m2
+```
+
+    
+### Calcular el máximo de cada columna, visualizarlo en una fila nueva.
+    
+```{r}
+maximos=c(
+max(matriz[,1]),
+max(matriz[,2]),
+max(matriz[,3]),
+max(matriz[,4]),
+max(matriz[,6]),
+max(matriz[,7]),
+max(matriz[,8]),
+max(matriz[,9]))
+mat_max=rbind(matriz,maximos)
+mat_max
+```
+    
+    
+### Calcular el producto matricial de A por su traspuesta.
+
+
+```{r}
+matriz%*% t(matriz)
+```
+
+
